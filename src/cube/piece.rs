@@ -15,7 +15,7 @@ macro_rules! position {
         crate::cube::position::Position::new(face!($f0), face!($f1))
     };
     [$f0: expr, $f1: expr, $f2: expr] => {
-        CornerPosition::new(face!($f0), face!($f1), face!($f2))
+        crate::cube::position::CornerPosition::new(face!($f0), face!($f1), face!($f2))
     }
 }
 
@@ -53,6 +53,13 @@ impl Edge {
         let mut edge = Self(id, pos);
         edge.resort();
         edge
+    }
+
+    // !!for testing only TODO: remove
+    pub fn as_ruby(&self) -> [[Face; 2]; 2] {
+        let id = self.0.faces();
+        let pos = self.1.faces();
+        [[id.0, id.1], [pos.0, pos.1]]
     }
 }
 
@@ -100,6 +107,13 @@ impl Corner {
         let mut corner = Self(id, pos);
         corner.resort();
         corner
+    }
+
+    // !!for testing only TODO: remove
+    pub fn as_ruby(&self) -> [[Face; 3]; 2] {
+        let id = self.0.faces();
+        let pos = self.1.faces();
+        [[id.0, id.1, id.2], [pos.0, pos.1, pos.2]]
     }
 }
 

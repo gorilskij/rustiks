@@ -66,9 +66,79 @@ fn test_transpose() {
     assert_eq!(moved, edge![2, 3, 5, 0])
 }
 
+macro_rules! to_faces {
+    [$($num: expr),*] => {
+        [$(
+            Face::new($num),
+        )*]
+    }
+}
+
+fn test_adjacent() {
+    assert_eq!(face!(0).adjacent(), to_faces![1, 2, 4, 5]);
+    assert_eq!(face!(1).adjacent(), to_faces![0, 2, 3, 5]);
+    assert_eq!(face!(2).adjacent(), to_faces![0, 1, 3, 4]);
+    assert_eq!(face!(3).adjacent(), to_faces![1, 2, 4, 5]);
+    assert_eq!(face!(4).adjacent(), to_faces![0, 2, 3, 5]);
+    assert_eq!(face!(5).adjacent(), to_faces![0, 1, 3, 4]);
+
+    assert_eq!(face!(0).adjacent_clockwise(), to_faces![5, 4, 2, 1]);
+    assert_eq!(face!(1).adjacent_clockwise(), to_faces![0, 2, 3, 5]);
+    assert_eq!(face!(2).adjacent_clockwise(), to_faces![4, 3, 1, 0]);
+    assert_eq!(face!(3).adjacent_clockwise(), to_faces![1, 2, 4, 5]);
+    assert_eq!(face!(4).adjacent_clockwise(), to_faces![5, 3, 2, 0]);
+    assert_eq!(face!(5).adjacent_clockwise(), to_faces![0, 1, 3, 4]);
+}
+
+macro_rules! assert_adjacent_edges {
+    ($face: expr, $edges: expr) => {{
+        let edges: [[u8; 2]; 4] = $edges;
+
+        for (e, c) in face!($face).adjacent_edges().iter().zip(edges.iter()) {
+            let faces = e.as_ruby();
+            assert_eq!(faces[0][0], face!(c[0]));
+            assert_eq!(faces[0][1], face!(c[1]))
+        }
+    }}
+}
+
+fn test_adjacent_edges() {
+    assert_adjacent_edges!(0, [[0, 1], [0, 2], [0, 4], [0, 5]]);
+    assert_adjacent_edges!(1, [[0, 1], [1, 2], [1, 3], [1, 5]]);
+    assert_adjacent_edges!(2, [[0, 2], [1, 2], [2, 3], [2, 4]]);
+    assert_adjacent_edges!(3, [[1, 3], [2, 3], [3, 4], [3, 5]]);
+    assert_adjacent_edges!(4, [[0, 4], [2, 4], [3, 4], [4, 5]]);
+    assert_adjacent_edges!(5, [[0, 5], [1, 5], [3, 5], [4, 5]]);
+}
+
+macro_rules! assert_adjacent_corners {
+    ($face: expr, $corners: expr) => {{
+        let corners: [[u8; 3]; 4] = $corners;
+
+        for (e, c) in face!($face).adjacent_corners().iter().zip(corners.iter()) {
+            let faces = e.as_ruby();
+            assert_eq!(faces[0][0], face!(c[0]));
+            assert_eq!(faces[0][1], face!(c[1]));
+            assert_eq!(faces[0][2], face!(c[2]))
+        }
+    }}
+}
+
+fn test_adjacent_corners() {
+    assert_adjacent_corners!(0, [[0, 1, 2], [0, 2, 4], [0, 4, 5], [0, 1, 5]]);
+    assert_adjacent_corners!(1, [[0, 1, 2], [1, 2, 3], [1, 3, 5], [0, 1, 5]]);
+    assert_adjacent_corners!(2, [[0, 1, 2], [1, 2, 3], [2, 3, 4], [0, 2, 4]]);
+    assert_adjacent_corners!(3, [[1, 2, 3], [2, 3, 4], [3, 4, 5], [1, 3, 5]]);
+    assert_adjacent_corners!(4, [[0, 2, 4], [2, 3, 4], [3, 4, 5], [0, 4, 5]]);
+    assert_adjacent_corners!(5, [[0, 1, 5], [1, 3, 5], [3, 4, 5], [0, 4, 5]]);
+}
+
 pub fn test() {
     test_projection();
     test_transpose();
+    test_adjacent();
+    test_adjacent_edges();
+    test_adjacent_corners();
 
     println!("ALL TESTS PASSED SUCCESSFULLY")
 }

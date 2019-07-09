@@ -5,6 +5,20 @@ use crate::cube::{Edge, Corner};
 use std::ops::{Add, Sub, Deref};
 use std::cmp::Ordering;
 
+// TODO: implement this better
+macro_rules! collect_to_array {
+    ($iter: expr, [$type: ty; $len: expr]) => {{
+        let mut iter = $iter;
+
+        let mut array: [$type; $len] = unsafe {
+            std::mem::transmute([std::mem::MaybeUninit::<$type>::uninit(); $len])
+        };
+
+        for i in 0..$len { array[i] = iter.next().unwrap(); }
+        array
+    }}
+}
+
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub struct Face(u8);
 
@@ -63,7 +77,9 @@ impl Face {
     }
 
     pub fn adjacent(self) -> [Face; 4] {
-        [self - 2, self - 1, self + 1, self + 2]
+        let mut adjacent = [self - 2, self - 1, self + 1, self + 2];
+        adjacent.sort();
+        adjacent
     }
 
     pub fn adjacent_clockwise(self) -> [Face; 4] {
@@ -73,21 +89,19 @@ impl Face {
     }
 
     pub fn adjacent_edges(self) -> [Edge; 4] {
-        let mut arr: [Edge; 4] = unsafe {
-            std::mem::transmute([MaybeUninit::<Edge>::uninit(); 4])
-        };
-
-        arr.copy_from_slice(
-            &self.adjacent()
-                .iter()
-                .map(|f| edge![*f, self])
-                .collect::<Vec<Edge>>() as &[Edge]
-        );
-        arr
+        let adjacent = self.adjacent();
+        collect_to_array!(
+            adjacent.iter().map(|f| edge![*f, self]),
+            [Edge; 4]
+        )
     }
 
-    pub fn adjacent_corners(&self) -> Vec<Corner> {
-        unimplemented!()
+    pub fn adjacent_corners(self) -> [Corner; 4] {
+        let adjacent = self.adjacent();
+        collect_to_array!(
+            (0..4).map(|i| corner![self, adjacent[i], adjacent[(i + 1) % 4]]),
+            [Corner; 4]
+        )
     }
 }
 

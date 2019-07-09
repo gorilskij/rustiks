@@ -17,7 +17,7 @@ pub struct Cube {
 impl Cube {
 //    pub fn solved() -> Self {
 //        let mut edges = Vec::with_capacity(12);
-////        let mut corners = Vec::with_capacity(8);
+//        let mut corners = Vec::with_capacity(8);
 //
 //        edges.append(&mut Face::new(0).adjacent_edges());
 //        edges.append(&mut Face::new(3).adjacent_edges());

@@ -61,6 +61,11 @@ impl Edge {
         let pos = self.1.faces();
         [[id.0, id.1], [pos.0, pos.1]]
     }
+
+    // this is only used in Cube::solved, TODO: replace this with something better
+    pub fn between(f0: Face, f1: Face) -> Self {
+        edge!(f0, f1)
+    }
 }
 
 impl Resort for Edge {

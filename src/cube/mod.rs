@@ -1,31 +1,52 @@
 pub use crate::cube::piece::{Edge, Corner};
 use crate::cube::face::Face;
+use std::slice::Iter;
 
 #[macro_use]
 pub mod piece;
 
+#[macro_use]
 pub mod face;
+
 pub mod position;
 pub mod transpose;
 pub mod resort;
 
 pub struct Cube {
-    edges: Vec<Edge>,
-    corners: Vec<Corner>
+    edges: [Edge; 12],
+    corners: [Corner; 8],
 }
 
 impl Cube {
-//    pub fn solved() -> Self {
-//        let mut edges = Vec::with_capacity(12);
-//        let mut corners = Vec::with_capacity(8);
-//
-//        edges.append(&mut Face::new(0).adjacent_edges());
-//        edges.append(&mut Face::new(3).adjacent_edges());
-//        edges.push(Edge::default_from_nums(1, 2));
-//        edges.push(Edge::default_from_nums(2, 4));
-//        edges.push(Edge::default_from_nums(4, 5));
-//        edges.push(Edge::default_from_nums(5, 1));
-//
-//        unimplemented!()
-//    }
+    // this method is generally ugly both visually and in implementation
+    // TODO: remove stink
+    pub fn solved() -> Self {
+        // note: lets come first because otherwise a "freed while in use"
+        // error is thrown, I think arrays aren't IntoIterator TODO: check
+        let edges_on_0 = face!(0).adjacent_edges();
+        let edges_on_3 = face!(3).adjacent_edges();
+        let edges_around = [
+            Edge::between(face!(1), face!(2)),
+            Edge::between(face!(2), face!(4)),
+            Edge::between(face!(4), face!(5)),
+            Edge::between(face!(5), face!(1)),
+        ];
+
+        let mut edges = edges_on_0.iter()
+            .chain(edges_on_3.iter())
+            .chain(edges_around.iter())
+            .map(|e| *e);
+
+        let corners_on_0 = face!(0).adjacent_corners();
+        let corners_on_3 = face!(3).adjacent_corners();
+
+        let corners = corners_on_0.iter()
+            .chain(corners_on_3.iter())
+            .map(|c| *c);
+
+        let edges = collect_to_array!(edges, [Edge; 12]);
+        let corners = collect_to_array!(corners, [Corner; 8]);
+
+        Self { edges, corners }
+    }
 }

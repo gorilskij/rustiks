@@ -5,20 +5,6 @@ use crate::cube::{Edge, Corner};
 use std::ops::{Add, Sub, Deref};
 use std::cmp::Ordering;
 
-// TODO: implement this better
-macro_rules! collect_to_array {
-    ($iter: expr, [$type: ty; $len: expr]) => {{
-        let mut iter = $iter;
-
-        let mut array: [$type; $len] = unsafe {
-            std::mem::transmute([std::mem::MaybeUninit::<$type>::uninit(); $len])
-        };
-
-        for i in 0..$len { array[i] = iter.next().unwrap(); }
-        array
-    }}
-}
-
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub struct Face(u8);
 
@@ -90,7 +76,7 @@ impl Face {
 
     pub fn adjacent_edges(self) -> [Edge; 4] {
         let adjacent = self.adjacent();
-        collect_to_array!(
+        array_collect!(
             adjacent.iter().map(|f| edge![*f, self]),
             [Edge; 4]
         )
@@ -98,7 +84,7 @@ impl Face {
 
     pub fn adjacent_corners(self) -> [Corner; 4] {
         let adjacent = self.adjacent();
-        collect_to_array!(
+        array_collect!(
             (0..4).map(|i| corner![self, adjacent[i], adjacent[(i + 1) % 4]]),
             [Corner; 4]
         )

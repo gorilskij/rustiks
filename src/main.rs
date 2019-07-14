@@ -4,6 +4,9 @@ use crate::cube::face::Face;
 use crate::cube::{Edge, Corner};
 
 #[macro_use]
+mod support;
+
+#[macro_use]
 mod cube;
 mod test;
 

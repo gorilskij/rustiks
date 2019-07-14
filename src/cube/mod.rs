@@ -2,6 +2,8 @@ pub use crate::cube::piece::{Edge, Corner};
 use crate::cube::face::Face;
 use std::slice::Iter;
 
+use super::support::Lazy;
+
 #[macro_use]
 pub mod piece;
 
@@ -12,10 +14,14 @@ pub mod position;
 pub mod transpose;
 pub mod resort;
 
+pub mod algorithm;
+
 pub struct Cube {
     edges: [Edge; 12],
     corners: [Corner; 8],
 }
+
+static mut SOLVED_CUBE: Lazy<Cube> = Lazy::new();
 
 impl Cube {
     // this method is generally ugly both visually and in implementation
@@ -44,8 +50,8 @@ impl Cube {
             .chain(corners_on_3.iter())
             .map(|c| *c);
 
-        let edges = collect_to_array!(edges, [Edge; 12]);
-        let corners = collect_to_array!(corners, [Corner; 8]);
+        let edges = array_collect!(edges, [Edge; 12]);
+        let corners = array_collect!(corners, [Corner; 8]);
 
         Self { edges, corners }
     }

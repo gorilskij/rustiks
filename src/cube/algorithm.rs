@@ -126,10 +126,11 @@ impl Algorithm {
     }
 
     pub fn simplified(&self) -> Self {
-        let mut second_pass_flag = false;
+        let mut another_pass = false;
 
-        let first_pass = self.to_owned().0
+        let processed = self.to_owned().0
             .iter()
+            // group moves by base move ([[U D] [F B F'] ...])
             .batching(|it| {
                 let first = match it.next() {
                     None => return None,
@@ -145,6 +146,7 @@ impl Algorithm {
 
                 Some((base_move, ret_vec))
             })
+            // simplify ([F B F' B2] => [B'])
             .flat_map(|(base_move, group)| {
                 let opposite_move = base_move.opposite();
                 let (mut base_sum, mut opposite_sum) = (0, 0);
@@ -164,14 +166,15 @@ impl Algorithm {
                 if base_sum != 0 { vec.push(Move(base_move, base_sum)) }
                 if opposite_sum != 0 { vec.push(Move(base_move.opposite(), opposite_sum)) }
 
-                if base_sum == 0 && opposite_sum == 0 { second_pass_flag = true }
+                if base_sum == 0 && opposite_sum == 0 { another_pass = true }
 
                 vec
             })
             .collect::<Self>();
 
+        // TODO: switch to loop (previous attempt yielded infinite loop weirdness)
         // possible recursive second pass for situations like (R U U' R')
-        if second_pass_flag { first_pass.simplified() } else { first_pass }
+        if another_pass { processed.simplified() } else { processed }
     }
 }
 

@@ -55,7 +55,7 @@ impl Edge {
         edge
     }
 
-    // !!for testing only TODO: remove
+    #[cfg(test)]
     pub fn as_ruby(&self) -> [[Face; 2]; 2] {
         let id = self.0.faces();
         let pos = self.1.faces();
@@ -114,7 +114,7 @@ impl Corner {
         corner
     }
 
-    // !!for testing only TODO: remove
+    #[cfg(test)]
     pub fn as_ruby(&self) -> [[Face; 3]; 2] {
         let id = self.0.faces();
         let pos = self.1.faces();

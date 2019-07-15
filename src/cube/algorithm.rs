@@ -1,5 +1,6 @@
 use itertools::Itertools;
 use std::fmt::{Display, Formatter, Error, Debug};
+use std::iter::FromIterator;
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 enum MoveType {
@@ -108,6 +109,12 @@ impl From<&str> for Algorithm {
     }
 }
 
+impl FromIterator<Move> for Algorithm {
+    fn from_iter<I: IntoIterator<Item=Move>>(iter: I) -> Self {
+        Self(Vec::from_iter(iter))
+    }
+}
+
 impl Algorithm {
     pub fn reversed(&self) -> Self {
         let mut move_reversed = self.0
@@ -119,10 +126,9 @@ impl Algorithm {
     }
 
     pub fn simplified(&self) -> Self {
-        // TODO: reduce collects
+        let mut second_pass_flag = false;
 
-        let copy = self.to_owned();
-        let groups = copy.0
+        let first_pass = self.to_owned().0
             .iter()
             .batching(|it| {
                 let first = match it.next() {
@@ -132,50 +138,44 @@ impl Algorithm {
 
                 let base_move = first.base_move();
 
-                let tail = it
-                    .peeking_take_while(|m| m.base_move() == base_move);
-
                 let mut ret_vec = vec![first];
-                ret_vec.extend(tail);
+                ret_vec.extend(
+                    it.peeking_take_while(|m| m.base_move() == base_move)
+                );
+
                 Some((base_move, ret_vec))
             })
-            .collect::<Vec<_>>();
-
-        let mut second_pass = false;
-
-        let reduced_groups = groups
-            .iter()
             .flat_map(|(base_move, group)| {
-                let base_sum = group
-                    .iter()
-                    .filter(|m| m.0 == *base_move)
-                    .fold(0, |sum, m| (sum + m.1) % 4);
+                let opposite_move = base_move.opposite();
+                let (mut base_sum, mut opposite_sum) = (0, 0);
 
-                let opposite_sum = group
-                    .iter()
-                    .filter(|m| m.0 != *base_move)
-                    .fold(0, |sum, m| (sum + m.1) % 4);
+                for m in group {
+                    match m.0 {
+                        t if t == base_move =>
+                            base_sum = (base_sum + m.1) % 4,
+                        t if t == opposite_move =>
+                            opposite_sum = (opposite_sum + m.1) % 4,
+                        _ => panic!()
+                    }
+                }
 
                 let mut vec = vec![];
-                if base_sum != 0 { vec.push(Move(*base_move, base_sum)) }
-                if opposite_sum != 0 { vec.push(Move(base_move.opposite(), opposite_sum))}
 
-                if base_sum == 0 && opposite_sum == 0 { second_pass = true }
+                if base_sum != 0 { vec.push(Move(base_move, base_sum)) }
+                if opposite_sum != 0 { vec.push(Move(base_move.opposite(), opposite_sum)) }
+
+                if base_sum == 0 && opposite_sum == 0 { second_pass_flag = true }
 
                 vec
             })
-            .collect::<Vec<_>>();
+            .collect::<Self>();
 
-        let mut simplified = Self(reduced_groups);
-
-        // recursive second pass for situations like (R U U' R')
-        if second_pass { simplified = simplified.simplified() }
-
-        simplified
+        // possible recursive second pass for situations like (R U U' R')
+        if second_pass_flag { first_pass.simplified() } else { first_pass }
     }
 }
 
-impl Display for Algorithm {
+impl Debug for Algorithm {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(f, "{}", self.0
             .iter()
@@ -183,11 +183,5 @@ impl Display for Algorithm {
             .intersperse(" ".into())
             .collect::<String>()
         )
-    }
-}
-
-impl Debug for Algorithm {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "{}", self)
     }
 }

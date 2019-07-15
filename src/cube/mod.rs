@@ -5,7 +5,7 @@ use std::slice::Iter;
 use super::support::Lazy;
 use std::fmt::{Debug, Formatter, Error, Display};
 use crate::cube::transpose::{Transpose, Projection};
-use crate::cube::position::{EdgePosition, CornerPosition};
+use crate::cube::position::{EdgePosition, CornerPosition, Position};
 use itertools::Itertools;
 
 #[macro_use]
@@ -106,32 +106,32 @@ impl Cube {
         }
     }
 
-    pub fn front_face(&self) -> FaceMatrix {
+    pub fn get_face(&self, face: Face, below: Face) -> FaceMatrix {
+        let position = position!(face, below);
+
         // basic assumptions:
-        let f = 5;
-        let b = 2;
-        let d = 0;
-        let u = 3;
-        let l = 1;
-        let r = 4;
-
-        let face = face!(5);
-
+        let f = face!(5).transpose_from_default(position);
+        let b = face!(2).transpose_from_default(position);
+        let d = face!(0).transpose_from_default(position);
+        let u = face!(3).transpose_from_default(position);
+        let l = face!(1).transpose_from_default(position);
+        let r = face!(4).transpose_from_default(position);
+        
         FaceMatrix([
             [
-                self.corner_at(position!(f, l, u)).id_on(face),
-                self.edge_at(position!(f, u)).id_on(face),
-                self.corner_at(position!(f, r, u)).id_on(face),
+                self.corner_at(position!(f, l, u)).id_on(f),
+                self.edge_at(position!(f, u)).id_on(f),
+                self.corner_at(position!(f, r, u)).id_on(f),
             ],
             [
-                self.edge_at(position!(f, l)).id_on(face),
-                face,
-                self.edge_at(position!(f, r)).id_on(face),
+                self.edge_at(position!(f, l)).id_on(f),
+                f,
+                self.edge_at(position!(f, r)).id_on(f),
             ],
             [
-                self.corner_at(position!(f, l, d)).id_on(face),
-                self.edge_at(position!(f, d)).id_on(face),
-                self.corner_at(position!(f, r, d)).id_on(face),
+                self.corner_at(position!(f, l, d)).id_on(f),
+                self.edge_at(position!(f, d)).id_on(f),
+                self.corner_at(position!(f, r, d)).id_on(f),
             ]
         ])
     }

@@ -5,6 +5,14 @@ use crate::cube::{Edge, Corner};
 use std::ops::{Add, Sub, Deref};
 use std::cmp::Ordering;
 
+/// convert a list of ints to an array of faces
+#[macro_export]
+macro_rules! to_faces {
+    [$($num: expr),*] => {
+        [$(Face::new($num),)*]
+    }
+}
+
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub struct Face(u8);
 
@@ -49,8 +57,10 @@ impl Sub for Face {
 }
 
 impl Face {
-    pub fn new(value: u8) -> Self {
-        assert!(value <= 5);
+    pub const fn new(value: u8) -> Self {
+        // commented due to assert not working with const fn
+        // TODO: find a way to still check
+//        assert!(value <= 5);
         Self(value)
     }
 

@@ -55,6 +55,19 @@ impl Edge {
         edge
     }
 
+    pub fn is_at(&self, position: EdgePosition) -> bool {
+        self.1 == position
+    }
+
+    pub fn id_on(&self, pos_face: Face) -> Face {
+        let (id, pos) = (self.0.faces(), self.1.faces());
+        match pos_face {
+            f if f == pos.0 => id.0,
+            f if f == pos.1 => id.1,
+            _ => panic!("edge {} not on face {}", self, pos_face)
+        }
+    }
+
     #[cfg(test)]
     pub fn as_ruby(&self) -> [[Face; 2]; 2] {
         let id = self.0.faces();
@@ -114,6 +127,20 @@ impl Corner {
         corner
     }
 
+    pub fn is_at(&self, position: CornerPosition) -> bool {
+        self.1 == position
+    }
+
+    pub fn id_on(&self, pos_face: Face) -> Face {
+        let (id, pos) = (self.0.faces(), self.1.faces());
+        match pos_face {
+            f if f == pos.0 => id.0,
+            f if f == pos.1 => id.1,
+            f if f == pos.2 => id.2,
+            _ => panic!("corner {} not on face {}", self, pos_face)
+        }
+    }
+
     #[cfg(test)]
     pub fn as_ruby(&self) -> [[Face; 3]; 2] {
         let id = self.0.faces();
@@ -162,3 +189,5 @@ impl Debug for Corner {
         write!(f, "C[{:?}, {:?}, {:?}]->({:?}, {:?}, {:?})", id0, id1, id2, pos0, pos1, pos2)
     }
 }
+
+// TODO: reimplement displays and debugs in terms of positions

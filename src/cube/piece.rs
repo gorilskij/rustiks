@@ -56,7 +56,7 @@ impl Edge {
     }
 
     pub fn is_at(&self, position: EdgePosition) -> bool {
-        self.1 == position
+        self.1.sorted() == position.sorted()
     }
 
     pub fn id_on(&self, pos_face: Face) -> Face {
@@ -128,7 +128,7 @@ impl Corner {
     }
 
     pub fn is_at(&self, position: CornerPosition) -> bool {
-        self.1 == position
+        self.1.sorted() == position.sorted()
     }
 
     pub fn id_on(&self, pos_face: Face) -> Face {

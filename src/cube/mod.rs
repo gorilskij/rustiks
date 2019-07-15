@@ -107,7 +107,7 @@ impl Cube {
     }
 
     pub fn get_face(&self, face: Face, below: Face) -> FaceMatrix {
-        let position = position!(face, below);
+        let position = position!(below, face);
 
         // basic assumptions:
         let f = face!(5).transpose_from_default(position);

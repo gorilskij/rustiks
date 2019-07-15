@@ -9,9 +9,7 @@ pub struct Position(Face, Face);
 
 impl Position {
     pub fn new(f0: Face, f1: Face) -> Self {
-        let mut vec = vec![f0, f1];
-        vec.sort();
-        Self(vec[0], vec[1])
+        Self(f0, f1)
     }
 
     pub fn faces(&self) -> (Face, Face) {
@@ -43,6 +41,14 @@ impl Position {
 
         array
     }
+
+    pub fn sorted(&self) -> Self {
+        if self.0 > self.1 {
+            Self(self.1, self.0)
+        } else {
+            *self
+        }
+    }
 }
 
 impl Transpose for Position {
@@ -73,13 +79,18 @@ pub struct CornerPosition(Face, Face, Face);
 
 impl CornerPosition {
     pub fn new(f0: Face, f1: Face, f2: Face) -> Self {
-        let mut vec = vec![f0, f1, f2];
-        vec.sort();
-        Self(vec[0], vec[1], vec[2])
+        Self(f0, f1, f2)
     }
 
     pub fn faces(&self) -> (Face, Face, Face) {
         (self.0, self.1, self.2)
+    }
+
+    pub fn sorted(&self) -> Self {
+        let fs = self.faces();
+        let mut vec = vec![fs.0, fs.1, fs.2];
+        vec.sort();
+        Self(vec[0], vec[1], vec[2])
     }
 }
 

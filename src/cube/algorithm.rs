@@ -2,7 +2,6 @@ use itertools::Itertools;
 use std::fmt::{Display, Formatter, Error, Debug};
 use std::iter::FromIterator;
 use crate::cube::face::Face;
-use crate::cube::algorithm::MoveType::L;
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 enum MoveType {

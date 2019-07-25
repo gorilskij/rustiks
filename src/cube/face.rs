@@ -1,9 +1,7 @@
-use std::mem::{transmute, MaybeUninit};
 use crate::cube::transpose::{Transpose, Projection};
 use std::fmt::{Display, Formatter, Error, Debug};
 use crate::cube::{Edge, Corner};
-use std::ops::{Add, Sub, Deref};
-use std::cmp::Ordering;
+use std::ops::{Add, Sub};
 
 /// convert a list of ints to an array of faces
 #[macro_export]
@@ -41,7 +39,7 @@ impl Add for Face {
 impl Sub<u8> for Face {
     type Output = Self;
 
-    fn sub(self, mut other: u8) -> Self::Output {
+    fn sub(self, other: u8) -> Self::Output {
         let mut self_0 = self.0;
         while other > self_0 { self_0 += 6; }
         Self((self_0 - other) % 6)

@@ -172,8 +172,8 @@ impl Piece for Corner {
 
 impl Resort for Corner {
     fn resort(&mut self) {
-        let mut id = self.0.faces();
-        let mut pos = self.1.faces();
+        let id = self.0.faces();
+        let pos = self.1.faces();
         let mut vec = vec![
             (id.0, pos.0),
             (id.1, pos.1),

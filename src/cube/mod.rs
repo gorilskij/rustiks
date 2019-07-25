@@ -4,11 +4,10 @@ use crate::cube::face::Face;
 use super::support::Lazy;
 use std::fmt::{Debug, Formatter, Error, Display};
 use crate::cube::transpose::{Transpose, Projection, Transposed};
-use crate::cube::position::{EdgePosition, CornerPosition, Position};
+use crate::cube::position::{EdgePosition, CornerPosition};
 use itertools::Itertools;
 use crate::cube::algorithm::{Algorithm, Move};
 use crate::cube::piece::Piece;
-use std::io::Chain;
 
 #[macro_use]
 pub mod piece;
@@ -78,7 +77,7 @@ impl Cube {
             Edge::between(face!(5), face!(1)),
         ];
 
-        let mut edges = edges_on_0.iter()
+        let edges = edges_on_0.iter()
             .chain(edges_on_3.iter())
             .chain(&edges_around)
             .map(|e| *e);
@@ -93,7 +92,7 @@ impl Cube {
         let edges = collect_edges!(edges);
         let corners = collect_corners!(corners);
 
-        Self { edges, corners, }
+        Self { edges, corners }
     }
 
     pub fn edge_at(&self, position: EdgePosition) -> &Edge {

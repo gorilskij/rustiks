@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use crate::cube::position::Position;
 use crate::cube::face::Face;
 use crate::cube::{Edge, Corner};

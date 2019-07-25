@@ -13,15 +13,17 @@ macro_rules! apply_ab_tests {
 }
 
 macro_rules! edge_from_ruby {
-    ($arr: expr) => {
-        edge!($arr[0][0], $arr[0][1], $arr[1][0], $arr[1][1])
-    }
+    ($arr: expr) => {{
+        let [[i0, i1], [p0, p1]] = $arr;
+        edge!(i0, i1, p0, p1)
+    }}
 }
 
 macro_rules! corner_from_ruby {
-    ($arr: expr) => {
-        corner!($arr[0][0], $arr[0][1], $arr[0][2], $arr[1][0], $arr[1][1], $arr[1][2])
-    }
+    ($arr: expr) => {{
+        let [[i0, i1, i2], [p0, p1, p2]] = $arr;
+        corner!(i0, i1, i2, p0, p1, p2)
+    }}
 }
 
 #[test]

@@ -3,7 +3,7 @@ use std::fmt::{Display, Formatter, Error, Debug};
 use crate::cube::{Edge, Corner};
 use std::ops::{Add, Sub};
 
-/// convert a list of ints to an array of faces
+// convert a list of ints to an array of faces
 #[macro_export]
 macro_rules! to_faces {
     [$($num: expr),*] => {

@@ -1,6 +1,8 @@
 use itertools::Itertools;
 use std::fmt::{Display, Formatter, Error, Debug};
 use std::iter::FromIterator;
+use crate::cube::face::Face;
+use crate::cube::algorithm::MoveType::L;
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 enum MoveType {
@@ -76,6 +78,24 @@ impl Move {
 
     fn base_move(&self) -> MoveType {
         self.0.base_move()
+    }
+
+    // TODO: maybe implement some cube state where 'R' isn't always the same face
+    pub fn face(&self) -> Face {
+        face!(
+            match self.0 {
+                MoveType::D => 0,
+                MoveType::L => 1,
+                MoveType::B => 2,
+                MoveType::U => 3,
+                MoveType::R => 4,
+                MoveType::F => 5,
+            }
+        )
+    }
+
+    pub fn times(&self) -> u8 {
+        self.1
     }
 }
 
@@ -176,6 +196,10 @@ impl Algorithm {
         // possible recursive second pass for situations like (R U U' R')
         if another_pass { processed.simplified() } else { processed }
     }
+
+    pub fn iter(&self) -> AlgorithmIterator {
+        AlgorithmIterator(0, &self.0)
+    }
 }
 
 impl Debug for Algorithm {
@@ -186,5 +210,28 @@ impl Debug for Algorithm {
             .intersperse(" ".into())
             .collect::<String>()
         )
+    }
+}
+
+impl IntoIterator for Algorithm {
+    type Item = Move;
+    type IntoIter = std::vec::IntoIter<Self::Item>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.into_iter()
+    }
+}
+
+pub struct AlgorithmIterator<'a>(usize, &'a [Move]);
+
+impl<'a> Iterator for AlgorithmIterator<'a> {
+    type Item = &'a Move;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.0 >= self.1.len() { return None }
+
+        let m = &self.1[self.0];
+        self.0 += 1;
+        Some(m)
     }
 }

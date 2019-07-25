@@ -11,10 +11,10 @@ macro_rules! face {
 
 #[macro_export]
 macro_rules! position {
-    [$f0: expr, $f1: expr] => {
+    ($f0: expr, $f1: expr) => {
         crate::cube::position::Position::new(face!($f0), face!($f1))
     };
-    [$f0: expr, $f1: expr, $f2: expr] => {
+    ($f0: expr, $f1: expr, $f2: expr) => {
         crate::cube::position::CornerPosition::new(face!($f0), face!($f1), face!($f2))
     }
 }
@@ -45,6 +45,10 @@ macro_rules! corner {
     }}
 }
 
+pub trait Piece: Debug + Display + Transpose {
+
+}
+
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub struct Edge(EdgePosition, EdgePosition);
 
@@ -57,6 +61,11 @@ impl Edge {
 
     pub fn is_at(&self, position: EdgePosition) -> bool {
         self.1.sorted() == position.sorted()
+    }
+
+    pub fn has_face_on(&self, face: Face) -> bool {
+        let pos = self.1.faces();
+        pos.0 == face || pos.1 == face
     }
 
     pub fn id_on(&self, pos_face: Face) -> Face {
@@ -81,6 +90,10 @@ impl Edge {
     }
 }
 
+impl Piece for Edge {
+
+}
+
 impl Resort for Edge {
     fn resort(&mut self) {
         let ids = self.0.faces();
@@ -93,11 +106,10 @@ impl Resort for Edge {
 }
 
 impl Transpose for Edge {
-    fn transpose_with_projection(&self, from: Projection, to: Projection) -> Self {
-        Self::new(
-            self.0.transpose_with_projection(from, to),
-            self.1.transpose_with_projection(from, to)
-        )
+    fn transpose_with_projection(&mut self, from: Projection, to: Projection) {
+        self.0.transpose_with_projection(from, to);
+        self.1.transpose_with_projection(from, to);
+        self.resort();
     }
 }
 
@@ -131,6 +143,11 @@ impl Corner {
         self.1.sorted() == position.sorted()
     }
 
+    pub fn has_face_on(&self, face: Face) -> bool {
+        let pos = self.1.faces();
+        pos.0 == face || pos.1 == face || pos.2 == face
+    }
+
     pub fn id_on(&self, pos_face: Face) -> Face {
         let (id, pos) = (self.0.faces(), self.1.faces());
         match pos_face {
@@ -147,6 +164,10 @@ impl Corner {
         let pos = self.1.faces();
         [[id.0, id.1, id.2], [pos.0, pos.1, pos.2]]
     }
+}
+
+impl Piece for Corner {
+
 }
 
 impl Resort for Corner {
@@ -166,11 +187,10 @@ impl Resort for Corner {
 }
 
 impl Transpose for Corner {
-    fn transpose_with_projection(&self, from: Projection, to: Projection) -> Self {
-        Self::new(
-            self.0.transpose_with_projection(from, to),
-            self.1.transpose_with_projection(from, to)
-        )
+    fn transpose_with_projection(&mut self, from: Projection, to: Projection) {
+        self.0.transpose_with_projection(from, to);
+        self.1.transpose_with_projection(from, to);
+        self.resort();
     }
 }
 

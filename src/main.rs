@@ -1,5 +1,5 @@
 use crate::cube::position::Position;
-use crate::cube::transpose::Transpose;
+use crate::cube::transpose::{Transpose, Transposed};
 use crate::cube::face::Face;
 use crate::cube::{Edge, Corner, Cube};
 use crate::cube::algorithm::Algorithm;
@@ -11,9 +11,29 @@ mod support;
 mod cube;
 mod test;
 
-fn main() {
-//    println!("{:?}", face!(5).transpose(position!(0, 5), position!(5, 0)))
+// TODO: implement move_to for pieces
 
-    let mut cube = Cube::solved();
-    println!("{:?}", cube.get_face(0.into(), 5.into()))
+//fn main() {
+////    println!("{:?}", face!(5).transpose(position!(0, 5), position!(5, 0)))
+//
+//    let mut cube = Cube::solved();
+//    println!("{:?}", cube.get_face(0.into(), 1.into()));
+//    println!("{:?}", cube.iter_pieces().next().unwrap());
+//
+//    for piece in cube.iter_pieces_mut() {
+//        piece.transpose(position!(0, 5), position!(5, 0))
+//    }
+//
+//    println!();
+//    println!("{:?}", cube.get_face(0.into(), 1.into()));
+//    println!("{:?}", cube.iter_pieces().next().unwrap());
+//}
+
+fn main() {
+    let edge = edge!(1, 3);
+    println!("{:?}", edge);
+    let pos_from = position!(1, 5);
+    let pos_to = position!(5, 0);
+    let trans = edge.transposed(pos_from, pos_to);
+    println!("{:?}", trans);
 }

@@ -52,11 +52,9 @@ impl Position {
 }
 
 impl Transpose for Position {
-    fn transpose_with_projection(&self, from: Projection, to: Projection) -> Self {
-        Position(
-            self.0.transpose_with_projection(from, to),
-            self.1.transpose_with_projection(from, to)
-        )
+    fn transpose_with_projection(&mut self, from: Projection, to: Projection) {
+        self.0.transpose_with_projection(from, to);
+        self.1.transpose_with_projection(from, to);
     }
 }
 
@@ -95,12 +93,10 @@ impl CornerPosition {
 }
 
 impl Transpose for CornerPosition {
-    fn transpose_with_projection(&self, from: Projection, to: Projection) -> Self {
-        CornerPosition(
-            self.0.transpose_with_projection(from, to),
-            self.1.transpose_with_projection(from, to),
-            self.2.transpose_with_projection(from, to)
-        )
+    fn transpose_with_projection(&mut self, from: Projection, to: Projection) {
+        self.0.transpose_with_projection(from, to);
+        self.1.transpose_with_projection(from, to);
+        self.2.transpose_with_projection(from, to);
     }
 }
 

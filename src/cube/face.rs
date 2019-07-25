@@ -102,13 +102,13 @@ impl Face {
 }
 
 impl Transpose for Face {
-    fn transpose_with_projection(&self, from: Projection, to: Projection) -> Self {
+    fn transpose_with_projection(&mut self, from: Projection, to: Projection) {
         let index = from
             .iter()
             .position(|x| x == self)
             .unwrap();
 
-        to[index]
+        *self = to[index]
     }
 }
 

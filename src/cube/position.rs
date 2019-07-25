@@ -2,6 +2,7 @@ use crate::cube::face::Face;
 use crate::cube::transpose::{Transpose, Projection};
 use std::mem::MaybeUninit;
 use std::fmt::{Debug, Display, Formatter, Error};
+use std::iter::once;
 
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub struct Position(Face, Face);
@@ -16,29 +17,24 @@ impl Position {
     }
 
     pub fn projection(&self) -> [Face; 6] {
-        let mut array: [Face; 6] = unsafe {
-            std::mem::transmute([MaybeUninit::<Face>::uninit(); 6])
-        };
-
-        array[0] = self.0;
-        array[5] = self.0.opposite();
-
         let mut mid = self.0.adjacent_clockwise();
 
+        let len = mid.len();
         let index = mid
             .iter()
             .position(|x| *x == self.1)
             .unwrap();
 
-        let len = mid.len();
-
         mid.rotate_left((index + 3) % len);
 
-        for i in 1..=4 {
-            array[i] = mid[i - 1]
-        }
+        // this is ugly, TODO: improve
+        let opposite = self.0.opposite();
+        let iterator = once(&self.0)
+            .chain(&mid)
+            .chain(once(&opposite))
+            .map(|x| *x);
 
-        array
+        array_collect!(iterator, [Face; 6])
     }
 
     pub fn sorted(&self) -> Self {

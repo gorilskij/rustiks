@@ -1,5 +1,4 @@
-use crate::cube::position::Position;
-use crate::cube::face::Face;
+use super::piece::{face::Face, position::Position};
 
 pub type Projection = [Face; 6];
 

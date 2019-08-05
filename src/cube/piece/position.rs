@@ -1,8 +1,22 @@
-use crate::cube::face::Face;
+use super::face::Face;
 use crate::cube::transpose::{Transpose, Projection};
 use std::mem::MaybeUninit;
 use std::fmt::{Debug, Display, Formatter, Error};
 use std::iter::once;
+
+#[macro_export]
+macro_rules! position {
+    ($f0: expr, $f1: expr) => {
+        crate::cube::position::Position::new($crate::face!($f0), $crate::face!($f1))
+    };
+    ($f0: expr, $f1: expr, $f2: expr) => {
+        crate::cube::position::CornerPosition::new(
+            $crate::face!($f0),
+            $crate::face!($f1),
+            $crate::face!($f2)
+        )
+    }
+}
 
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub struct Position(Face, Face);

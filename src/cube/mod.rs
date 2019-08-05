@@ -1,23 +1,19 @@
-pub use crate::cube::piece::{Edge, Corner};
-use crate::cube::face::Face;
+pub use piece::{edge::Edge, corner::Corner};
+
+#[macro_use]
+use piece::face::Face;
 
 use super::support::Lazy;
 use std::fmt::{Debug, Formatter, Error, Display};
 use crate::cube::transpose::{Transpose, Projection, Transposed};
-use crate::cube::position::{EdgePosition, CornerPosition};
+use piece::position::{EdgePosition, CornerPosition};
 use itertools::Itertools;
 use crate::cube::algorithm::{Algorithm, Move};
 use crate::cube::piece::Piece;
-
-#[macro_use]
 pub mod piece;
 
-#[macro_use]
-pub mod face;
-
-pub mod position;
 pub mod transpose;
-pub mod resort;
+mod resort;
 
 pub mod algorithm;
 

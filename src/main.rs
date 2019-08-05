@@ -1,7 +1,7 @@
-use crate::cube::transpose::{Transpose, Transposed};
-use crate::cube::face::Face;
-use crate::cube::{Edge, Corner, Cube};
-use crate::cube::algorithm::Algorithm;
+use cube::transpose::{Transpose, Transposed};
+use cube::{Edge, Corner};
+use cube::Cube;
+use cube::algorithm::Algorithm;
 
 #[macro_use]
 mod support;

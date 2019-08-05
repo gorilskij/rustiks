@@ -1,5 +1,5 @@
-use crate::cube::position::Position;
-use crate::cube::face::Face;
+use crate::cube::piece::position::Position;
+use crate::cube::piece::face::Face;
 use crate::cube::{Edge, Corner};
 use crate::cube::transpose::{Transpose, Transposed};
 use crate::cube::algorithm::Algorithm;

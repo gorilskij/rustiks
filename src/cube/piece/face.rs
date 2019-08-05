@@ -1,7 +1,12 @@
 use crate::cube::transpose::{Transpose, Projection};
 use std::fmt::{Display, Formatter, Error, Debug};
-use crate::cube::{Edge, Corner};
 use std::ops::{Add, Sub};
+use crate::cube::piece::{edge::Edge, corner::Corner};
+
+#[macro_export]
+macro_rules! face {
+    ($v: expr) => { Face::from($v) }
+}
 
 // convert a list of ints to an array of faces
 #[macro_export]

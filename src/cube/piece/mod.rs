@@ -18,7 +18,4 @@ pub trait Piece: Debug + Display + Transpose {
 
 }
 
-
-
-
 // TODO: reimplement displays and debugs in terms of positions

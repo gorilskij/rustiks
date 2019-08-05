@@ -1,6 +1,5 @@
 use super::face::Face;
 use crate::cube::transpose::{Transpose, Projection};
-use std::mem::MaybeUninit;
 use std::fmt::{Debug, Display, Formatter, Error};
 use std::iter::once;
 

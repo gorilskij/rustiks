@@ -6,10 +6,9 @@ use crate::cube::algorithm::Algorithm;
 
 // apply a testing macro with 2 arguments (e.g. assert_eq) to many pairs of inputs
 macro_rules! apply_ab_tests {
-    {$eq_fn: ident; $(($a: tt, $b: tt));*} => {
+    {$eq_fn: ident; $(($a: tt, $b: tt));* $(;)?} => {
         $( $eq_fn!($a, $b) );*
     };
-    {$($s: tt);*;} => {apply_ab_tests!{ $($s);* }} // for trailing `;`
 }
 
 macro_rules! edge_from_ruby {

@@ -1,5 +1,4 @@
 use cube::transpose::{Transpose, Transposed};
-use cube::{Edge, Corner};
 use cube::Cube;
 use cube::algorithm::Algorithm;
 

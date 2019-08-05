@@ -15,28 +15,28 @@ pub trait Transpose {
     }
 }
 
-pub trait Transposed where Self: Sized {
+pub trait Transposed: Sized {
     fn transposed_with_projection(&self, from: Projection, to: Projection) -> Self;
     fn transposed(&self, from: Position, to: Position) -> Self;
     fn transposed_from_default(&self, to: Position) -> Self;
 }
 
-impl<T: Transpose + Clone> Transposed for T {
-    fn transposed_with_projection(&self, from: Projection, to: Projection) -> Self {
-        let mut clone = self.clone();
-        clone.transpose_with_projection(from, to);
-        clone
+macro_rules! convert_methods {
+    ( $( $old_name: ident ( $( $param: ident $type: ty ),* ) => $new_name: ident );* $(;)? ) => {
+        $(
+            fn $new_name(&self, $( $param: $type ),* ) -> Self {
+                let mut clone = self.clone();
+                clone.$new_name( $( $param ),* );
+                clone
+            }
+        )*
     }
+}
 
-    fn transposed(&self, from: Position, to: Position) -> Self {
-        let mut clone = self.clone();
-        clone.transpose(from, to);
-        clone
-    }
-
-    fn transposed_from_default(&self, to: Position) -> Self {
-        let mut clone = self.clone();
-        clone.transpose_from_default(to);
-        clone
+impl<T: Transpose + Clone + Sized> Transposed for T {
+    convert_methods! {
+        transpose_with_projection(from Projection, to Projection) => transposed_with_projection;
+        transpose(from Position, to Position) => transposed;
+        transpose_from_default(to Position) => transposed_from_default;
     }
 }

@@ -1,7 +1,7 @@
 use super::face::Face;
 use crate::cube::piece::Piece;
 use crate::cube::resort::Resort;
-use super::position::{Position, CornerPosition};
+use super::position::CornerPosition;
 use crate::cube::transpose::{Transpose, Projection};
 use std::fmt::{Display, Formatter, Error, Debug};
 

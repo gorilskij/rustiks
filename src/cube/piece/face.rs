@@ -5,7 +5,7 @@ use crate::cube::piece::{edge::Edge, corner::Corner};
 
 #[macro_export]
 macro_rules! face {
-    ($v: expr) => { Face::from($v) }
+    ($v: expr) => { crate::cube::piece::face::Face::from($v) }
 }
 
 // convert a list of ints to an array of faces

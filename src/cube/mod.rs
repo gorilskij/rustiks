@@ -1,6 +1,5 @@
 pub use piece::{edge::Edge, corner::Corner};
 
-#[macro_use]
 use piece::face::Face;
 
 use super::support::Lazy;
@@ -10,6 +9,8 @@ use piece::position::{EdgePosition, CornerPosition};
 use itertools::Itertools;
 use crate::cube::algorithm::{Algorithm, Move};
 use crate::cube::piece::Piece;
+
+#[macro_use]
 pub mod piece;
 
 pub mod transpose;

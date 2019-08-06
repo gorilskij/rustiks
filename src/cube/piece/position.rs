@@ -5,10 +5,10 @@ use std::iter::once;
 
 #[macro_export]
 macro_rules! position {
-    ($f0: expr, $f1: expr) => {
+    ($f0:expr, $f1:expr) => {
         crate::cube::piece::position::Position::new($crate::face!($f0), $crate::face!($f1))
     };
-    ($f0: expr, $f1: expr, $f2: expr) => {
+    ($f0:expr, $f1:expr, $f2:expr) => {
         crate::cube::piece::position::CornerPosition::new(
             $crate::face!($f0),
             $crate::face!($f1),

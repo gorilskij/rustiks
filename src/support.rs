@@ -1,7 +1,7 @@
 // TODO: implement this better
 #[macro_export]
 macro_rules! array_collect {
-    ($iter: expr, [$type: ty; $len: expr]) => {{
+    ($iter:expr, [$type:ty; $len:expr]) => {{
         let mut iter = $iter;
 
         let mut array: [$type; $len] = unsafe {

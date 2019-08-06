@@ -6,12 +6,12 @@ use crate::cube::piece::{edge::Edge, corner::Corner};
 // Face is fully qualified to work when exported
 #[macro_export]
 macro_rules! face {
-    ($v: expr) => { crate::cube::piece::face::Face::from($v) }
+    ($v:expr) => { crate::cube::piece::face::Face::from($v) }
 }
 
 // convert a list of ints to an array of faces
 macro_rules! to_faces {
-    [$($num: expr),*] => {
+    [$($num:expr),*] => {
         [$(Face::new($num),)*]
     }
 }

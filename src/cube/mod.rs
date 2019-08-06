@@ -28,11 +28,11 @@ pub struct Cube {
 static mut SOLVED_CUBE: Lazy<Cube> = Lazy::new();
 
 macro_rules! collect_edges {
-    ($iter: expr) => { array_collect!($iter, [Edge; 12]) }
+    ($iter:expr) => { array_collect!($iter, [Edge; 12]) }
 }
 
 macro_rules! collect_corners {
-    ($iter: expr) => { array_collect!($iter, [Corner; 8]) }
+    ($iter:expr) => { array_collect!($iter, [Corner; 8]) }
 }
 
 pub struct FaceMatrix([[Face; 3]; 3]);

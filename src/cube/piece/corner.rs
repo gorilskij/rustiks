@@ -7,11 +7,11 @@ use std::fmt::{Display, Formatter, Error, Debug};
 
 #[macro_export]
 macro_rules! corner {
-    ($f0: expr, $f1: expr, $f2: expr) => {{
+    ($f0:expr, $f1:expr, $f2:expr) => {{
         let id = position![$f0, $f1, $f2];
         Corner::new(id, id)
     }};
-    ($id0: expr, $id1: expr, $id2: expr, $pos0: expr, $pos1: expr, $pos2: expr) => {{
+    ($id0:expr, $id1:expr, $id2:expr, $pos0:expr, $pos1:expr, $pos2:expr) => {{
         let id = position![$id0, $id1, $id2];
         let pos = position![$pos0, $pos1, $pos2];
         Corner::new(id, pos)

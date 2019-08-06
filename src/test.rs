@@ -6,20 +6,20 @@ use crate::cube::algorithm::Algorithm;
 
 // apply a testing macro with 2 arguments (e.g. assert_eq) to many pairs of inputs
 macro_rules! apply_ab_tests {
-    {$eq_fn: ident; $(($a: tt, $b: tt));* $(;)?} => {
+    {$eq_fn:ident; $(($a:tt, $b:tt));* $(;)?} => {
         $( $eq_fn!($a, $b) );*
     };
 }
 
 macro_rules! edge_from_ruby {
-    ($arr: expr) => {{
+    ($arr:expr) => {{
         let [[i0, i1], [p0, p1]] = $arr;
         edge!(i0, i1, p0, p1)
     }}
 }
 
 macro_rules! corner_from_ruby {
-    ($arr: expr) => {{
+    ($arr:expr) => {{
         let [[i0, i1, i2], [p0, p1, p2]] = $arr;
         corner!(i0, i1, i2, p0, p1, p2)
     }}
@@ -29,7 +29,7 @@ macro_rules! corner_from_ruby {
 fn test_projection() {
     // for (position, projection) test that position.projection() == projection
     macro_rules! assert_eq_projection {
-        ([$($id: expr),*], [$($face: expr),*]) => {{
+        ([$($id:expr),*], [$($face:expr),*]) => {{
             let position: Position = position![$($id),*];
             let correct_projection: [Face; 6] = to_faces![$($face),*];
 
@@ -69,8 +69,8 @@ fn test_projection() {
 #[test]
 fn test_transpose_face() {
     macro_rules! assert_eq_transpose_face {
-        // $face_from_to: (face, [from, from], [to, to])
-        ($face_from_to: expr, $expected: expr) => {{
+        // $face_from_to:(face, [from, from], [to, to])
+        ($face_from_to:expr, $expected:expr) => {{
             let (face, from, to) = $face_from_to;
             let from_pos = position!(from[0], from[1]);
             let to_pos = position!(to[0], to[1]);
@@ -188,7 +188,7 @@ fn test_transpose_face() {
 #[test]
 fn test_transpose_edge() {
     macro_rules! assert_eq_transpose_edge {
-        (($edge: expr, $from: expr, $to: expr), $expected: expr) => {{
+        (($edge:expr, $from:expr, $to:expr), $expected:expr) => {{
             let edge = edge_from_ruby!($edge);
             let from_pos = position!($from[0], $from[1]);
             let to_pos = position!($to[0], $to[1]);
@@ -306,7 +306,7 @@ fn test_transpose_edge() {
 #[test]
 fn test_transpose_corner() {
     macro_rules! assert_eq_transpose_corner {
-        (($corner: expr, $from: expr, $to: expr), $expected: expr) => {{
+        (($corner:expr, $from:expr, $to:expr), $expected:expr) => {{
             let corner = corner_from_ruby!($corner);
             let from_pos = position!($from[0], $from[1]);
             let to_pos = position!($to[0], $to[1]);
@@ -425,14 +425,14 @@ fn test_transpose_corner() {
 fn test_adjacent() {
     // for (face, adjacent_faces) test that face.adjacent() == adjacent_faces
     macro_rules! assert_eq_adjacent {
-        ($face: expr, [$($fc: expr),*]) => {
+        ($face:expr, [$($fc:expr),*]) => {
             assert_eq!(face!($face).adjacent(), to_faces![$($fc),*])
         }
     }
 
     // same as above but with face.adjacent_clockwise()
     macro_rules! assert_eq_adjacent_clockwise {
-        ($face: expr, [$($fc: expr),*]) => {
+        ($face:expr, [$($fc:expr),*]) => {
             assert_eq!(face!($face).adjacent_clockwise(), to_faces![$($fc),*])
         }
     }
@@ -462,7 +462,7 @@ fn test_adjacent() {
 fn test_adjacent_edges() {
     // for (face, adjacent_edges) test that face.adjacent_edges() == adjacent_edges
     macro_rules! assert_adjacent_edges {
-        ($face: expr, $edges: expr) => {{
+        ($face:expr, $edges:expr) => {{
             let edges: [[u8; 2]; 4] = $edges;
             for (e, c) in face!($face).adjacent_edges().iter().zip(edges.iter()) {
                 let faces = e.as_ruby()[0];
@@ -486,7 +486,7 @@ fn test_adjacent_edges() {
 fn test_adjacent_corners() {
     // same as macro in test_adjacent_edges but with face.adjacent_corners()
     macro_rules! assert_adjacent_corners {
-        ($face: expr, $corners: expr) => {{
+        ($face:expr, $corners:expr) => {{
             let corners: [[u8; 3]; 4] = $corners;
             for (e, c) in face!($face).adjacent_corners().iter().zip(corners.iter()) {
                 let faces = e.as_ruby()[0];
@@ -510,7 +510,7 @@ fn test_adjacent_corners() {
 fn test_algorithm_reversed() {
     // for (algorithm, reversed) test that algorithm.reversed() == reversed
     macro_rules! assert_eq_reversed {
-        ($alg: expr, $rev: expr) => {
+        ($alg:expr, $rev:expr) => {
             assert_eq!(Algorithm::from($alg).reversed(), Algorithm::from($rev))
         }
     }
@@ -534,7 +534,7 @@ fn test_algorithm_reversed() {
 fn test_algorithm_simplified() {
     // same as macro in test_algorithm_reversed but with algorithm.simplified()
     macro_rules! assert_eq_simplified {
-        ($alg: expr, $sim: expr) => {
+        ($alg:expr, $sim:expr) => {
             assert_eq!(Algorithm::from($alg).simplified(), Algorithm::from($sim))
         }
     }

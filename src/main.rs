@@ -1,6 +1,8 @@
 use cube::transpose::{Transpose, Transposed};
 use cube::Cube;
 use cube::algorithm::Algorithm;
+use std::process::exit;
+use crate::cube::piece::face::Face;
 
 #[macro_use]
 mod support;

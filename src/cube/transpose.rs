@@ -26,7 +26,7 @@ macro_rules! convert_methods {
         $(
             fn $new_name(&self, $( $param: $type ),* ) -> Self {
                 let mut clone = self.clone();
-                clone.$new_name( $( $param ),* );
+                clone.$old_name( $( $param ),* );
                 clone
             }
         )*

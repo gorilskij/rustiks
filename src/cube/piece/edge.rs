@@ -8,7 +8,7 @@ use std::fmt::{Display, Formatter, Error, Debug};
 #[macro_export]
 macro_rules! edge {
     ($f0:expr, $f1:expr) => {{
-        let id = $crate::position![$f0, $f1];
+        let id = position![$f0, $f1];
         Edge::new(id, id)
     }};
     ($id0:expr, $id1:expr, $pos0:expr, $pos1:expr) => {{

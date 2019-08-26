@@ -9,6 +9,7 @@ use piece::position::{EdgePosition, CornerPosition};
 use itertools::Itertools;
 use crate::cube::algorithm::{Algorithm, Move};
 use crate::cube::piece::Piece;
+use std::process::exit;
 
 #[macro_use]
 pub mod piece;
@@ -53,7 +54,12 @@ impl Debug for FaceMatrix {
         write!(f, "{}",
                self.0
                    .iter()
-                   .map(|line| format!("{:?} {:?} {:?}", line[0], line[1], line[2]))
+                   .map(|line|
+                       line
+                           .iter()
+                           .map(|f| format!("{:?}", f))
+                           .join(" ")
+                   )
                    .join("\n")
         )
     }
@@ -116,7 +122,7 @@ impl Cube {
         let u = face!(3).transposed_from_default(position);
         let l = face!(1).transposed_from_default(position);
         let r = face!(4).transposed_from_default(position);
-        
+
         FaceMatrix([
             [
                 self.corner_at(position!(f, l, u)).id_on(f),

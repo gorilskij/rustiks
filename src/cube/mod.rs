@@ -223,6 +223,34 @@ impl Transpose for Cube {
 
 impl Debug for Cube {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        unimplemented!()
+        macro_rules! format_face {
+            ($face: expr, $below: expr) => {
+                format!("{:?}", self.get_face($face.into(), $below.into()))
+            };
+        }
+
+        macro_rules! push_face {
+            ($face: expr) => {
+                $face.lines().map(|l| {
+                    vec!["       ", l].join("")
+                }).collect::<Vec<_>>().join("\n");
+            }
+        }
+
+        let face0 = push_face!(format_face!(0, 1));
+        let face1 = format_face!(1, 3);
+        let face2 = format_face!(2, 3);
+        let face3 = push_face!(format_face!(3, 4));
+        let face4 = format_face!(4, 3);
+        let face5 = format_face!(5, 3);
+
+        let central_band = face1.lines().zip(face2.lines()).zip(face4.lines()).zip(face5.lines())
+            .map(|(((l1, l2), l4), l5)| {
+                vec![l1, l2, l4, l5].join("  ")
+            }).collect::<Vec<_>>().join("\n");
+
+        writeln!(f, "{}\n", face0)?;
+        writeln!(f, "{}\n", central_band)?;
+        writeln!(f, "{}", face3)
     }
 }

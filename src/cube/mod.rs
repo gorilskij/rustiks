@@ -10,6 +10,7 @@ use itertools::Itertools;
 use crate::cube::algorithm::{Algorithm, Move};
 use crate::cube::piece::Piece;
 use std::process::exit;
+use std::iter::Filter;
 
 #[macro_use]
 pub mod piece;
@@ -112,8 +113,13 @@ impl Cube {
         }
     }
 
-    pub fn get_face(&self, face: Face, below: Face) -> FaceMatrix {
+    pub fn get_face<F: Into<Face>>(&self, face: F, below: F) -> FaceMatrix {
+        let (face, below) = (face.into(), below.into());
         let position = position!(below, face);
+
+        println!("{:?}", position);
+
+        println!("[5, 2, 0, 3, 1, 4]");
 
         // basic assumptions:
         let f = face!(5).transposed_from_default(position);
@@ -122,6 +128,8 @@ impl Cube {
         let u = face!(3).transposed_from_default(position);
         let l = face!(1).transposed_from_default(position);
         let r = face!(4).transposed_from_default(position);
+
+        println!("{:?}", [f,b,d,u,l,r]);
 
         FaceMatrix([
             [
@@ -148,6 +156,17 @@ impl Cube {
 
     pub(crate) fn iter_pieces_mut(&mut self) -> IterMut {
         IterMut::new(self)
+    }
+
+    pub fn iter_pieces_on<F: Into<Face>>(&self, face: F) -> impl Iterator<Item=&dyn Piece> {
+        let face = face.into();
+        self.iter_pieces().filter(move |p: &&dyn Piece| p.is_on(face))
+    }
+
+    pub fn iter_pieces_on_mut<F: Into<Face>>(&mut self, face: F)
+        -> impl Iterator<Item=&mut dyn Piece> {
+        let face = face.into();
+        self.iter_pieces_mut().filter(move |p| p.is_on(face))
     }
 
     fn apply_move(&mut self, m: &Move) {
@@ -225,7 +244,7 @@ impl Debug for Cube {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         macro_rules! format_face {
             ($face: expr, $below: expr) => {
-                format!("{:?}", self.get_face($face.into(), $below.into()))
+                format!("{:?}", self.get_face($face, $below))
             };
         }
 

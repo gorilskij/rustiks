@@ -1,3 +1,5 @@
+#![allow(unused_imports)]
+
 use cube::transpose::{Transpose, Transposed};
 use cube::Cube;
 use cube::algorithm::Algorithm;
@@ -15,18 +17,8 @@ mod test;
 
 fn main() {
     let mut cube = Cube::solved();
-    println!("{:?}", cube);
-    for piece in cube.iter_pieces_mut() {
-        piece.transpose(position!(0, 5), position!(5, 0))
+    for piece in cube.iter_pieces_on_mut(0) {
+        piece.transpose_pos(position!(0, 5), position!(2, 0))
     }
-//    println!("{:?}", cube.get_face(0.into(), 1.into()));
-//    println!("{:?}", cube.iter_pieces().next().unwrap());
-//
-//    for piece in cube.iter_pieces_mut() {
-//        piece.transpose(position!(0, 5), position!(5, 0))
-//    }
-//
-//    println!();
-//    println!("{:?}", cube.get_face(0.into(), 1.into()));
-//    println!("{:?}", cube.iter_pieces().next().unwrap());
+    println!("{:?}", cube);
 }

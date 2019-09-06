@@ -32,11 +32,6 @@ impl Edge {
         self.1.sorted() == position.sorted()
     }
 
-    pub fn has_face_on(&self, face: Face) -> bool {
-        let pos = self.1.faces();
-        pos.0 == face || pos.1 == face
-    }
-
     pub fn id_on(&self, pos_face: Face) -> Face {
         let (id, pos) = (self.0.faces(), self.1.faces());
         match pos_face {
@@ -60,7 +55,15 @@ impl Edge {
 }
 
 impl Piece for Edge {
+    fn is_on(&self, face: Face) -> bool {
+        let pos = self.1.faces();
+        pos.0 == face || pos.1 == face
+    }
 
+    fn transpose_pos_with_projection(&mut self, from: Projection, to: Projection) {
+        self.1.transpose_with_projection(from, to);
+        self.resort();
+    }
 }
 
 impl Resort for Edge {

@@ -5,6 +5,7 @@ use cube::Cube;
 use cube::algorithm::Algorithm;
 use std::process::exit;
 use crate::cube::piece::face::Face;
+use crate::cube::piece::Piece;
 
 #[macro_use]
 mod support;
@@ -17,8 +18,10 @@ mod test;
 
 fn main() {
     let mut cube = Cube::solved();
-    for piece in cube.iter_pieces_on_mut(0) {
+
+    for piece in cube.iter_corners_mut() {
         piece.transpose_pos(position!(0, 5), position!(2, 0))
     }
+
     println!("{:?}", cube);
 }

@@ -33,7 +33,8 @@ impl Corner {
     }
 
     pub fn id_on(&self, pos_face: Face) -> Face {
-        let (id, pos) = (self.0.faces(), self.1.faces());
+        let id = self.0.faces();
+        let pos = self.1.faces();
         match pos_face {
             f if f == pos.0 => id.0,
             f if f == pos.1 => id.1,

@@ -10,7 +10,8 @@ use itertools::Itertools;
 use crate::cube::algorithm::{Algorithm, Move};
 use crate::cube::piece::Piece;
 use std::process::exit;
-use std::iter::Filter;
+use std::iter::{Filter, Chain, Map};
+use std::io::Read;
 
 #[macro_use]
 pub mod piece;
@@ -114,8 +115,7 @@ impl Cube {
     }
 
     pub fn get_face<F: Into<Face>>(&self, face: F, below: F) -> FaceMatrix {
-        let (face, below) = (face.into(), below.into());
-        let position = position!(below, face);
+        let position = position!(below.into(), face.into());
 
         println!("{:?}", position);
 
@@ -150,25 +150,6 @@ impl Cube {
         ])
     }
 
-    pub fn iter_pieces(&self) -> Iter {
-        Iter::new(self)
-    }
-
-    pub(crate) fn iter_pieces_mut(&mut self) -> IterMut {
-        IterMut::new(self)
-    }
-
-    pub fn iter_pieces_on<F: Into<Face>>(&self, face: F) -> impl Iterator<Item=&dyn Piece> {
-        let face = face.into();
-        self.iter_pieces().filter(move |p: &&dyn Piece| p.is_on(face))
-    }
-
-    pub fn iter_pieces_on_mut<F: Into<Face>>(&mut self, face: F)
-        -> impl Iterator<Item=&mut dyn Piece> {
-        let face = face.into();
-        self.iter_pieces_mut().filter(move |p| p.is_on(face))
-    }
-
     fn apply_move(&mut self, m: &Move) {
 //        let (face, times) = (m.face(), m.times());
 //        self.edges
@@ -184,49 +165,100 @@ impl Cube {
     }
 }
 
-pub struct Iter<'a>(usize, &'a Cube);
-
-impl<'a> Iter<'a> {
-    fn new(cube: &'a Cube) -> Self {
-        Self(0, cube)
+// iteration
+impl Cube {
+    pub fn iter_edges(&self) -> impl Iterator<Item=&Edge> { self.edges.iter() }
+    pub fn iter_corners(&self) -> impl Iterator<Item=&Corner> { self.corners.iter() }
+    pub fn iter_pieces(&self) -> impl Iterator<Item=&dyn Piece> {
+        self.iter_edges()
+            .map(|e| e as &dyn Piece)
+            .chain(
+                self.iter_corners()
+                    .map(|c| c as &dyn Piece)
+            )
     }
+    pub fn iter_edges_mut(&mut self) -> impl Iterator<Item=&mut Edge> { self.edges.iter_mut() }
+    pub fn iter_corners_mut(&mut self) -> impl Iterator<Item=&mut Corner> { self.corners.iter_mut() }
+//    pub fn iter_pieces_mut(&mut self) -> impl Iterator<Item=&mut dyn Piece> {
+//        unreachable!()
+//    }
+
+    pub fn iter_pieces_on<F: Into<Face>>(&self, face: F) -> impl Iterator<Item=&dyn Piece> {
+        let face = face.into();
+        self.iter_pieces().filter(move |p: &&dyn Piece| p.is_on(face))
+    }
+
+//    pub fn iter_pieces_on_mut<F: Into<Face>>(&mut self, face: F)
+//                                             -> impl Iterator<Item=&mut dyn Piece> {
+//        let face = face.into();
+//        self.iter_pieces_mut().filter(move |p| p.is_on(face))
+//    }
 }
 
-impl<'a> Iterator for Iter<'a> {
-    type Item = &'a dyn Piece;
+//impl<'a, FE, FC> IntoIterator for &'a Cube
+//where FE: Fn(&Edge) -> &dyn Piece,
+//      FC: Fn(&Corner) -> &dyn Piece
+//{
+//    type Item = &'a dyn Piece;
+//    type IntoIter = Chain<Map<SliceIter<'a, Edge>, FE>, Map<SliceIter<'a, Corner>, FC>>;
+//
+//    fn into_iter(self) -> Self::IntoIter {
+//        self.iter_pieces()
+//    }
+//}
 
-    fn next(& mut self) -> Option<Self::Item> {
-        let piece = match self.0 {
-            i@0..=11 => &self.1.edges[i] as &_,
-            i@12..=19 => &self.1.corners[i - 12] as &_,
-            _ => return None
-        };
-        self.0 += 1;
-        Some(piece)
-    }
-}
+//impl<'a, I: Iterator<Item=&'a mut dyn Piece>> IntoIterator for &'a mut Cube {
+//    type Item = &'a mut dyn Piece;
+//    type IntoIter = I;
+//
+//    fn into_iter(self) -> Self::IntoIter {
+//        self.iter_pieces_mut()
+//    }
+//}
 
-pub struct IterMut<'a>(usize, &'a mut Cube);
-
-impl<'a> IterMut<'a> {
-    fn new(cube: &'a mut Cube) -> Self {
-        Self(0, cube)
-    }
-}
-
-impl<'a> Iterator for IterMut<'a> {
-    type Item = &'a mut dyn Piece;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let piece: *mut dyn Piece = match self.0 {
-            i@0..=11 => &mut self.1.edges[i],
-            i@12..=19 => &mut self.1.corners[i - 12],
-            _ => return None
-        };
-        self.0 += 1;
-        Some(unsafe { &mut *piece })
-    }
-}
+//pub struct Iter<'a>(usize, &'a Cube);
+//
+//impl<'a> Iter<'a> {
+//    fn new(cube: &'a Cube) -> Self {
+//        Self(0, cube)
+//    }
+//}
+//
+//impl<'a> Iterator for Iter<'a> {
+//    type Item = &'a dyn Piece;
+//
+//    fn next(& mut self) -> Option<Self::Item> {
+//        let piece = match self.0 {
+//            i@0..=11 => &self.1.edges[i] as &_,
+//            i@12..=19 => &self.1.corners[i - 12] as &_,
+//            _ => return None
+//        };
+//        self.0 += 1;
+//        Some(piece)
+//    }
+//}
+//
+//pub struct IterMut<'a>(usize, &'a mut Cube);
+//
+//impl<'a> IterMut<'a> {
+//    fn new(cube: &'a mut Cube) -> Self {
+//        Self(0, cube)
+//    }
+//}
+//
+//impl<'a> Iterator for IterMut<'a> {
+//    type Item = &'a mut dyn Piece;
+//
+//    fn next(&mut self) -> Option<Self::Item> {
+//        let piece: *mut dyn Piece = match self.0 {
+//            i@0..=11 => &mut self.1.edges[i],
+//            i@12..=19 => &mut self.1.corners[i - 12],
+//            _ => return None
+//        };
+//        self.0 += 1;
+//        Some(unsafe { &mut *piece })
+//    }
+//}
 
 impl Transpose for Cube {
     fn transpose_with_projection(&mut self, from: Projection, to: Projection) {

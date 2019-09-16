@@ -20,7 +20,7 @@ fn main() {
     let mut cube = Cube::solved();
 
     for piece in cube.iter_corners_mut() {
-        piece.transpose_pos(position!(0, 5), position!(2, 0))
+        piece.transpose_pos((0, 5).into(), (2, 0).into())
     }
 
     println!("{:?}", cube);

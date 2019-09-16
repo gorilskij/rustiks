@@ -20,6 +20,12 @@ macro_rules! position {
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub struct Position(Face, Face);
 
+impl<F: Into<Face>> From<(F, F)> for Position {
+    fn from((f0, f1): (F, F)) -> Self {
+        Self(f0.into(), f1.into())
+    }
+}
+
 impl Position {
     pub fn new(f0: Face, f1: Face) -> Self {
         Self(f0, f1)
@@ -82,6 +88,12 @@ impl Display for EdgePosition {
 
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub struct CornerPosition(Face, Face, Face);
+
+impl<F: Into<Face>> From<(F, F, F)> for CornerPosition {
+    fn from((f0, f1, f2): (F, F, F)) -> Self {
+        Self(f0.into(), f1.into(), f2.into())
+    }
+}
 
 impl CornerPosition {
     pub fn new(f0: Face, f1: Face, f2: Face) -> Self {

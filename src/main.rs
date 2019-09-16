@@ -19,9 +19,17 @@ mod test;
 fn main() {
     let mut cube = Cube::solved();
 
-    for piece in cube.iter_corners_mut() {
-        piece.transpose_pos((0, 5).into(), (2, 0).into())
-    }
+//    for piece in cube.iter_corners_mut() {
+//        piece.transpose_pos((0, 5).into(), (2, 0).into())
+//    }
+
+    cube.apply(&Algorithm::from("R"));
+//    cube.iter_edges_mut().for_each(|e| {
+//        println!("was {:?}", e);
+//        e.transpose((0, 1).into(), (0, 2).into());
+//        println!("is {:?}", e);
+//        println!()
+//    });
 
     println!("{:?}", cube);
 }

@@ -63,6 +63,14 @@ impl Position {
             *self
         }
     }
+
+    pub fn without(&self, face: Face) -> Face {
+        match face {
+            f if f == self.0 => self.1,
+            f if f == self.1 => self.0,
+            _ => panic!(),
+        }
+    }
 }
 
 impl Transpose for Position {
@@ -109,6 +117,15 @@ impl CornerPosition {
         let mut vec = vec![fs.0, fs.1, fs.2];
         vec.sort();
         Self(vec[0], vec[1], vec[2])
+    }
+
+    pub fn without(&self, face: Face) -> (Face, Face) {
+        match face {
+            f if f == self.0 => (self.1, self.2),
+            f if f == self.1 => (self.0, self.2),
+            f if f == self.2 => (self.1, self.2),
+            _ => panic!(),
+        }
     }
 }
 

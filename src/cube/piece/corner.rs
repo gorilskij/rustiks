@@ -49,6 +49,10 @@ impl Corner {
         let pos = self.1.faces();
         [[id.0, id.1, id.2], [pos.0, pos.1, pos.2]]
     }
+
+    pub fn position_without<F: Into<Face>>(&self, face: F) -> (Face, Face) {
+        self.1.without(face.into())
+    }
 }
 
 impl Piece for Corner {

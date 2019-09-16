@@ -111,7 +111,7 @@ impl Display for Move {
 
 impl Debug for Move {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "{}", self)
+        write!(f, "Rot(face: {:?}, times: {})", self.face(), self.1)
     }
 }
 

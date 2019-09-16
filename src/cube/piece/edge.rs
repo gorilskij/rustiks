@@ -52,6 +52,10 @@ impl Edge {
     pub fn between(f0: Face, f1: Face) -> Self {
         edge!(f0, f1)
     }
+
+    pub fn position_without<F: Into<Face>>(&self, face: F) -> Face {
+        self.1.without(face.into())
+    }
 }
 
 impl Piece for Edge {

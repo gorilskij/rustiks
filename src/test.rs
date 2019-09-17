@@ -1,8 +1,8 @@
-use crate::cube::piece::position::Position;
-use crate::cube::piece::face::Face;
-use crate::cube::{Edge, Corner};
-use crate::cube::transpose::{Transpose, Transposed};
-use crate::cube::algorithm::Algorithm;
+#[allow(unused_imports)] use crate::cube::piece::position::Position;
+#[allow(unused_imports)] use crate::cube::piece::face::Face;
+#[allow(unused_imports)] use crate::cube::{Edge, Corner};
+#[allow(unused_imports)] use crate::cube::transpose::{Transpose, Transposed};
+#[allow(unused_imports)] use crate::cube::algorithm::Algorithm;
 
 // apply a testing macro with 2 arguments (e.g. assert_eq) to many pairs of inputs
 macro_rules! apply_ab_tests {

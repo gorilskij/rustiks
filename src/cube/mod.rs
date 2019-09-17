@@ -9,10 +9,6 @@ use piece::position::{EdgePosition, CornerPosition};
 use itertools::Itertools;
 use crate::cube::algorithm::{Algorithm, Move};
 use crate::cube::piece::Piece;
-use std::process::exit;
-use std::iter::{Filter, Chain, Map};
-use std::io::Read;
-use std::ops::Index;
 
 #[macro_use]
 pub mod piece;
@@ -26,10 +22,6 @@ pub struct Cube {
     edges: [Edge; 12],
     corners: [Corner; 8],
 }
-
-
-
-static mut SOLVED_CUBE: Lazy<Cube> = Lazy::new();
 
 macro_rules! collect_edges {
     ($iter:expr) => { array_collect!($iter, [Edge; 12]) }
@@ -161,7 +153,7 @@ impl Cube {
                 let missing = edge.position_without(face);
                 let index: usize = clockwise.iter().position(
                     |x| *x == missing).unwrap();
-                let next = clockwise[(index + 1) % clockwise.len()];
+                let next = clockwise[(index + times as usize) % clockwise.len()];
                 println!("from {:?} to {:?}", (face, missing), (face, next));
                 println!("was: {:?}", edge);
                 edge.transpose_pos((face, missing).into(), (face, next).into());
@@ -177,7 +169,7 @@ impl Cube {
                 let index: usize = clockwise.iter().position(
                     |x| *x == missing
                 ).unwrap();
-                let next = clockwise[(index + 1) % clockwise.len()];
+                let next = clockwise[(index + times as usize) % clockwise.len()];
                 corner.transpose_pos((face, missing).into(), (face, next).into());
             });
     }

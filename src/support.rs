@@ -13,10 +13,10 @@ macro_rules! array_collect {
     }}
 }
 
-
-
+#[allow(dead_code)]
 pub struct Lazy<T>(Option<T>);
 
+#[allow(dead_code)]
 impl<T> Lazy<T> {
     pub const fn new() -> Self {
         Self(None)

@@ -8,33 +8,35 @@ use std::fmt::{Display, Formatter, Error, Debug};
 #[macro_export]
 macro_rules! corner {
     ($f0:expr, $f1:expr, $f2:expr) => {{
-        let id = position![$f0, $f1, $f2];
+        let id = pos![$f0, $f1, $f2];
         Corner::new(id, id)
     }};
     ($id0:expr, $id1:expr, $id2:expr, $pos0:expr, $pos1:expr, $pos2:expr) => {{
-        let id = position![$id0, $id1, $id2];
-        let pos = position![$pos0, $pos1, $pos2];
+        let id = pos![$id0, $id1, $id2];
+        let pos = pos![$pos0, $pos1, $pos2];
         Corner::new(id, pos)
     }}
 }
 
 #[derive(Copy, Clone, Eq, PartialEq)]
-pub struct Corner(CornerPosition, CornerPosition);
+pub struct Corner {
+    id: CornerPosition,
+    pos: CornerPosition,
+}
 
 impl Corner {
     pub fn new(id: CornerPosition, pos: CornerPosition) -> Self {
-        let mut corner = Self(id, pos);
+        let mut corner = Self { id, pos };
         corner.resort();
         corner
     }
 
     pub fn is_at(&self, position: CornerPosition) -> bool {
-        self.1.sorted() == position.sorted()
+        self.pos.sorted() == position.sorted()
     }
 
     pub fn id_on(&self, pos_face: Face) -> Face {
-        let id = self.0.faces();
-        let pos = self.1.faces();
+        let Self { id, pos } = self;
         match pos_face {
             f if f == pos.0 => id.0,
             f if f == pos.1 => id.1,
@@ -45,32 +47,30 @@ impl Corner {
 
     #[cfg(test)]
     pub fn as_ruby(&self) -> [[Face; 3]; 2] {
-        let id = self.0.faces();
-        let pos = self.1.faces();
+        let Self { id, pos } = self;
         [[id.0, id.1, id.2], [pos.0, pos.1, pos.2]]
     }
 
     pub fn position_without<F: Into<Face>>(&self, face: F) -> (Face, Face) {
-        self.1.without(face.into())
+        self.pos.without(face.into())
     }
 }
 
 impl Piece for Corner {
     fn is_on(&self, face: Face) -> bool {
-        let pos = self.1.faces();
+        let pos = self.pos;
         pos.0 == face || pos.1 == face || pos.2 == face
     }
 
     fn transpose_pos_with_projection(&mut self, from: Projection, to: Projection) {
-        self.1.transpose_with_projection(from, to);
+        self.pos.transpose_with_projection(from, to);
         self.resort();
     }
 }
 
 impl Resort for Corner {
     fn resort(&mut self) {
-        let id = self.0.faces();
-        let pos = self.1.faces();
+        let Self { id, pos } = self;
         let mut vec = vec![
             (id.0, pos.0),
             (id.1, pos.1),
@@ -78,31 +78,29 @@ impl Resort for Corner {
         ];
         vec.sort();
 
-        self.0 = CornerPosition::new(vec[0].0, vec[1].0, vec[2].0);
-        self.1 = CornerPosition::new(vec[0].1, vec[1].1, vec[2].1);
+        self.id = (vec[0].0, vec[1].0, vec[2].0).into();
+        self.pos = (vec[0].1, vec[1].1, vec[2].1).into();
     }
 }
 
 impl Transpose for Corner {
     fn transpose_with_projection(&mut self, from: Projection, to: Projection) {
-        self.0.transpose_with_projection(from, to);
-        self.1.transpose_with_projection(from, to);
+        self.id.transpose_with_projection(from, to);
+        self.pos.transpose_with_projection(from, to);
         self.resort();
     }
 }
 
 impl Display for Corner {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        let (id0, id1, id2) = self.0.faces();
-        let (pos0, pos1, pos2) = self.1.faces();
-        write!(f, "C[{}, {}, {}]->({}, {}, {})", id0, id1, id2, pos0, pos1, pos2)
+        let Self { id, pos } = self;
+        write!(f, "E[{}, {}, {}]->({}, {}, {})", id.0, id.1, id.2, pos.0, pos.1, pos.2)
     }
 }
 
 impl Debug for Corner {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        let (id0, id1, id2) = self.0.faces();
-        let (pos0, pos1, pos2) = self.1.faces();
-        write!(f, "C[{:?}, {:?}, {:?}]->({:?}, {:?}, {:?})", id0, id1, id2, pos0, pos1, pos2)
+        let Self { id, pos } = self;
+        write!(f, "C[{:?}, {:?}, {:?}]->({:?}, {:?}, {:?})", id.0, id.1, id.2, pos.0, pos.1, pos.2)
     }
 }

@@ -108,7 +108,7 @@ impl Cube {
     }
 
     pub fn get_face<F: Into<Face>>(&self, face: F, below: F) -> FaceMatrix {
-        let position = (below, face).into();
+        let position = cpos!(below, face);
 
         println!("{:?}", position);
 
@@ -154,11 +154,7 @@ impl Cube {
                 let index: usize = clockwise.iter().position(
                     |x| *x == missing).unwrap();
                 let next = clockwise[(index + times as usize) % clockwise.len()];
-                println!("from {:?} to {:?}", (face, missing), (face, next));
-                println!("was: {:?}", edge);
-                edge.transpose_pos((face, missing).into(), (face, next).into());
-                println!("is: {:?}", edge);
-                println!();
+                edge.transpose_pos(cpos!(face, missing), cpos!(face, next));
             });
 
         self.corners
@@ -170,7 +166,7 @@ impl Cube {
                     |x| *x == missing
                 ).unwrap();
                 let next = clockwise[(index + times as usize) % clockwise.len()];
-                corner.transpose_pos((face, missing).into(), (face, next).into());
+                corner.transpose_pos(cpos!(face, missing), cpos!(face, next));
             });
     }
 

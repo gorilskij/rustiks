@@ -19,7 +19,7 @@ macro_rules! to_faces {
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub struct Face(u8);
 
-impl<T> From<T> for Face where u8: From<T> {
+impl<T: Into<u8>> From<T> for Face {
     fn from(value: T) -> Self {
         Self::new(value.into())
     }

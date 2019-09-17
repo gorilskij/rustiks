@@ -1,24 +1,24 @@
-use super::piece::{face::Face, position::Position};
+use super::piece::{face::Face, position::CubePosition};
 
 pub type Projection = [Face; 6];
 
 pub trait Transpose {
     fn transpose_with_projection(&mut self, from: Projection, to: Projection);
 
-    fn transpose(&mut self, from: Position, to: Position){
+    fn transpose(&mut self, from: CubePosition, to: CubePosition){
         self.transpose_with_projection(from.projection(), to.projection())
     }
 
-    fn transpose_from_default(&mut self, to: Position) {
+    fn transpose_from_default(&mut self, to: CubePosition) {
         // TODO: check if 0, 5 or 5, 0
-        self.transpose(position![0, 5], to)
+        self.transpose(cpos!(0, 5), to)
     }
 }
 
 pub trait Transposed {
     fn transposed_with_projection(&self, from: Projection, to: Projection) -> Self;
-    fn transposed(&self, from: Position, to: Position) -> Self;
-    fn transposed_from_default(&self, to: Position) -> Self;
+    fn transposed(&self, from: CubePosition, to: CubePosition) -> Self;
+    fn transposed_from_default(&self, to: CubePosition) -> Self;
 }
 
 macro_rules! convert_methods {
@@ -36,7 +36,7 @@ macro_rules! convert_methods {
 impl<T: Transpose + Clone> Transposed for T {
     convert_methods! {
         transpose_with_projection(from: Projection, to: Projection) => transposed_with_projection;
-        transpose(from: Position, to: Position) => transposed;
-        transpose_from_default(to: Position) => transposed_from_default;
+        transpose(from: CubePosition, to: CubePosition) => transposed;
+        transpose_from_default(to: CubePosition) => transposed_from_default;
     }
 }

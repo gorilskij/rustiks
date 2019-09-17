@@ -81,16 +81,14 @@ impl Move {
 
     // TODO: maybe implement some cube state where 'R' isn't always the same face
     pub fn face(&self) -> Face {
-        face!(
-            match self.0 {
-                MoveType::D => 0,
-                MoveType::L => 1,
-                MoveType::B => 2,
-                MoveType::U => 3,
-                MoveType::R => 4,
-                MoveType::F => 5,
-            }
-        )
+        match self.0 {
+            MoveType::D => 0,
+            MoveType::L => 1,
+            MoveType::B => 2,
+            MoveType::U => 3,
+            MoveType::R => 4,
+            MoveType::F => 5,
+        }.into()
     }
 
     pub fn times(&self) -> u8 {

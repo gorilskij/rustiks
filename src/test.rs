@@ -25,6 +25,13 @@ macro_rules! corner_from_ruby {
     }}
 }
 
+// convert a list of ints to an array of faces
+macro_rules! to_faces {
+    [$($num:expr),*] => {
+        [$(Face::new($num),)*]
+    }
+}
+
 #[test]
 fn test_projection() {
     // for (position, projection) test that position.projection() == projection
@@ -74,8 +81,8 @@ fn test_transpose_face() {
             let (face, from, to) = $face_from_to;
             let from_pos = cpos!(from[0], from[1]);
             let to_pos = cpos!(to[0], to[1]);
-            let transposed = face!(face).transposed(from_pos, to_pos);
-            assert_eq!(transposed, face!($expected))
+            let transposed = Face::from(face).transposed(from_pos, to_pos);
+            assert_eq!(transposed, Face::from($expected))
         }}
     }
 
@@ -426,14 +433,14 @@ fn test_adjacent() {
     // for (face, adjacent_faces) test that face.adjacent() == adjacent_faces
     macro_rules! assert_eq_adjacent {
         ($face:expr, [$($fc:expr),*]) => {
-            assert_eq!(face!($face).adjacent(), to_faces![$($fc),*])
+            assert_eq!(Face::from($face).adjacent(), to_faces![$($fc),*])
         }
     }
 
     // same as above but with face.adjacent_clockwise()
     macro_rules! assert_eq_adjacent_clockwise {
         ($face:expr, [$($fc:expr),*]) => {
-            assert_eq!(face!($face).adjacent_clockwise(), to_faces![$($fc),*])
+            assert_eq!(Face::from($face).adjacent_clockwise(), to_faces![$($fc),*])
         }
     }
 
@@ -464,7 +471,7 @@ fn test_adjacent_edges() {
     macro_rules! assert_adjacent_edges {
         ($face:expr, $edges:expr) => {{
             let edges: [[u8; 2]; 4] = $edges;
-            for (e, c) in face!($face).adjacent_edges().iter().zip(edges.iter()) {
+            for (e, c) in Face::from($face).adjacent_edges().iter().zip(edges.iter()) {
                 let faces = e.as_ruby()[0];
                 assert_eq!(faces, to_faces![c[0], c[1]])
             }
@@ -488,7 +495,7 @@ fn test_adjacent_corners() {
     macro_rules! assert_adjacent_corners {
         ($face:expr, $corners:expr) => {{
             let corners: [[u8; 3]; 4] = $corners;
-            for (e, c) in face!($face).adjacent_corners().iter().zip(corners.iter()) {
+            for (e, c) in Face::from($face).adjacent_corners().iter().zip(corners.iter()) {
                 let faces = e.as_ruby()[0];
                 assert_eq!(faces, to_faces!(c[0], c[1], c[2]));
             }

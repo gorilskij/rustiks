@@ -1,5 +1,4 @@
 use crate::cube::piece::face::Face;
-use std::iter::once;
 use crate::cube::transpose::{Transpose, Projection};
 use std::fmt::{Debug, Display, Formatter, Error};
 

@@ -1,8 +1,3 @@
-use super::face::Face;
-use crate::cube::transpose::{Transpose, Projection};
-use std::fmt::{Debug, Display, Formatter, Error};
-use std::iter::once;
-
 #[macro_export]
 macro_rules! pos {
     ($f0:expr, $f1:expr) => {

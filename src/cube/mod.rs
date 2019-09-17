@@ -2,7 +2,6 @@ pub use piece::{edge::Edge, corner::Corner};
 
 use piece::face::Face;
 
-use super::support::Lazy;
 use std::fmt::{Debug, Formatter, Error, Display};
 use crate::cube::transpose::{Transpose, Projection, Transposed};
 use piece::position::{EdgePosition, CornerPosition};
@@ -66,13 +65,13 @@ impl Cube {
     pub fn solved() -> Self {
         // note: lets come first because otherwise a "freed while in use"
         // error is thrown, I think arrays aren't IntoIterator TODO: check
-        let edges_on_0 = face!(0).adjacent_edges();
-        let edges_on_3 = face!(3).adjacent_edges();
+        let edges_on_0 = Face::from(0).adjacent_edges();
+        let edges_on_3 = Face::from(3).adjacent_edges();
         let edges_around = [
-            Edge::between(face!(1), face!(2)),
-            Edge::between(face!(2), face!(4)),
-            Edge::between(face!(4), face!(5)),
-            Edge::between(face!(5), face!(1)),
+            Edge::between(1, 2),
+            Edge::between(2, 4),
+            Edge::between(4, 5),
+            Edge::between(5, 1),
         ];
 
         let edges = edges_on_0.iter()
@@ -80,8 +79,8 @@ impl Cube {
             .chain(&edges_around)
             .map(|e| *e);
 
-        let corners_on_0 = face!(0).adjacent_corners();
-        let corners_on_3 = face!(3).adjacent_corners();
+        let corners_on_0 = Face::from(0).adjacent_corners();
+        let corners_on_3 = Face::from(3).adjacent_corners();
 
         let corners = corners_on_0.iter()
             .chain(&corners_on_3)
@@ -115,12 +114,12 @@ impl Cube {
         println!("[5, 2, 0, 3, 1, 4]");
 
         // basic assumptions:
-        let f = face!(5).transposed_from_default(position);
-        let b = face!(2).transposed_from_default(position);
-        let d = face!(0).transposed_from_default(position);
-        let u = face!(3).transposed_from_default(position);
-        let l = face!(1).transposed_from_default(position);
-        let r = face!(4).transposed_from_default(position);
+        let f = Face::from(5).transposed_from_default(position);
+        let b = Face::from(2).transposed_from_default(position);
+        let d = Face::from(0).transposed_from_default(position);
+        let u = Face::from(3).transposed_from_default(position);
+        let l = Face::from(1).transposed_from_default(position);
+        let r = Face::from(4).transposed_from_default(position);
 
         println!("{:?}", [f,b,d,u,l,r]);
 

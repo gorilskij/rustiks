@@ -51,8 +51,8 @@ impl Edge {
     }
 
     // this is only used in Cube::solved, TODO: replace this with something better
-    pub fn between(f0: Face, f1: Face) -> Self {
-        edge!(f0, f1)
+    pub fn between<F: Into<Face>>(f0: F, f1: F) -> Self {
+        edge!(f0.into(), f1.into())
     }
 
     pub fn position_without<F: Into<Face>>(&self, face: F) -> Face {

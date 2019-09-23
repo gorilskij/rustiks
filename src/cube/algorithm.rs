@@ -3,6 +3,13 @@ use std::fmt::{Display, Formatter, Error, Debug};
 use std::iter::FromIterator;
 use super::piece::face::Face;
 
+#[macro_export]
+macro_rules! alg {
+    ($str: expr) => {
+        crate::cube::algorithm::Algorithm::from($str)
+    };
+}
+
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 enum MoveType {
     L, R, U, D, F, B
@@ -82,12 +89,12 @@ impl Move {
     // TODO: maybe implement some cube state where 'R' isn't always the same face
     pub fn face(&self) -> Face {
         match self.0 {
-            MoveType::D => 0,
+            MoveType::D => 3,
             MoveType::L => 1,
-            MoveType::B => 2,
-            MoveType::U => 3,
+            MoveType::B => 5,
+            MoveType::U => 0,
             MoveType::R => 4,
-            MoveType::F => 5,
+            MoveType::F => 2,
         }.into()
     }
 
@@ -118,11 +125,7 @@ pub struct Algorithm(Vec<Move>);
 
 impl From<&str> for Algorithm {
     fn from(s: &str) -> Self {
-        Self(
-            s.split_whitespace()
-                .map(|s| Move::from(s))
-                .collect()
-        )
+        Self(s.split_whitespace().map(|s| Move::from(s)).collect())
     }
 }
 
@@ -132,6 +135,7 @@ impl FromIterator<Move> for Algorithm {
     }
 }
 
+#[allow(dead_code)]
 impl Algorithm {
     pub fn reversed(&self) -> Self {
         let mut move_reversed = self.0
@@ -201,12 +205,7 @@ impl Algorithm {
 
 impl Debug for Algorithm {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "{}", self.0
-            .iter()
-            .map(|m| m.to_string())
-            .intersperse(" ".into())
-            .collect::<String>()
-        )
+        write!(f, "{}", self.0.iter().join(" "))
     }
 }
 

@@ -15,8 +15,10 @@ pub mod piece;
 pub mod transpose;
 mod resort;
 
+#[macro_use]
 pub mod algorithm;
 
+#[derive(PartialEq)]
 pub struct Cube {
     edges: [Edge; 12],
     corners: [Corner; 8],
@@ -92,6 +94,10 @@ impl Cube {
         Self { edges, corners }
     }
 
+    pub fn is_solved(&self) -> bool {
+        *self == Self::solved()
+    }
+
     pub fn edge_at(&self, position: EdgePosition) -> &Edge {
         match self.edges.iter().find(|e| e.is_at(position)) {
             Some(e) => e,
@@ -109,9 +115,9 @@ impl Cube {
     pub fn get_face<F: Into<Face>>(&self, face: F, below: F) -> FaceMatrix {
         let position = cpos!(below, face);
 
-        println!("{:?}", position);
+//        println!("{:?}", position);
 
-        println!("[5, 2, 0, 3, 1, 4]");
+//        println!("[5, 2, 0, 3, 1, 4]");
 
         // basic assumptions:
         let f = Face::from(5).transposed_from_default(position);
@@ -121,7 +127,7 @@ impl Cube {
         let l = Face::from(1).transposed_from_default(position);
         let r = Face::from(4).transposed_from_default(position);
 
-        println!("{:?}", [f,b,d,u,l,r]);
+//        println!("{:?}", [f,b,d,u,l,r]);
 
         FaceMatrix([
             [
@@ -171,13 +177,14 @@ impl Cube {
 
     pub fn apply(&mut self, algorithm: &Algorithm) {
         for m in algorithm.iter() {
-            println!("applying {:?}", m);
+//            println!("applying {:?}", m);
             self.apply_move(m)
         }
     }
 }
 
 // iteration
+#[allow(dead_code)]
 impl Cube {
     pub fn iter_edges(&self) -> impl Iterator<Item=&Edge> { self.edges.iter() }
     pub fn iter_corners(&self) -> impl Iterator<Item=&Corner> { self.corners.iter() }
@@ -210,36 +217,47 @@ impl Transpose for Cube {
     }
 }
 
-impl Debug for Cube {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        macro_rules! format_face {
-            ($face: expr, $below: expr) => {
-                format!("{:?}", self.get_face($face, $below))
-            };
-        }
+macro_rules! impl_cube_fmt {
+    ($trait: ty, $fmt: expr) => {
+        impl $trait for Cube {
+            fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+                macro_rules! format_face {
+                    ($face: expr, $below: expr) => {
+                        format!($fmt, self.get_face($face, $below))
+                    };
+                }
 
-        macro_rules! push_face {
-            ($face: expr) => {
-                $face.lines().map(|l| {
-                    vec!["       ", l].join("")
-                }).collect::<Vec<_>>().join("\n");
+                macro_rules! push_face {
+                    ($face: expr) => {
+                        $face.lines().map(|l| {
+                            vec!["       ", l].join("")
+                        }).collect::<Vec<_>>().join("\n");
+                    }
+                }
+
+                let face0 = push_face!(format_face!(0, 2));
+                let face1 = format_face!(1, 3);
+                let face2 = format_face!(2, 3);
+                let face3 = push_face!(format_face!(3, 5));
+                let face4 = format_face!(4, 3);
+                let face5 = format_face!(5, 3);
+
+                let central_band = face1
+                    .lines()
+                    .zip(face2.lines())
+                    .zip(face4.lines())
+                    .zip(face5.lines())
+                    .map(|(((l1, l2), l4), l5)|
+                        vec![l1, l2, l4, l5].join("  ")
+                    ).join("\n");
+
+                writeln!(f, "{}\n", face0)?;
+                writeln!(f, "{}\n", central_band)?;
+                writeln!(f, "{}", face3)
             }
         }
-
-        let face0 = push_face!(format_face!(0, 2));
-        let face1 = format_face!(1, 3);
-        let face2 = format_face!(2, 3);
-        let face3 = push_face!(format_face!(3, 5));
-        let face4 = format_face!(4, 3);
-        let face5 = format_face!(5, 3);
-
-        let central_band = face1.lines().zip(face2.lines()).zip(face4.lines()).zip(face5.lines())
-            .map(|(((l1, l2), l4), l5)| {
-                vec![l1, l2, l4, l5].join("  ")
-            }).collect::<Vec<_>>().join("\n");
-
-        writeln!(f, "{}\n", face0)?;
-        writeln!(f, "{}\n", central_band)?;
-        writeln!(f, "{}", face3)
     }
 }
+
+impl_cube_fmt!(Debug, "{:?}");
+impl_cube_fmt!(Display, "{}");

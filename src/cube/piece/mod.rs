@@ -3,17 +3,9 @@ use crate::cube::transpose::{Transpose, Projection};
 use crate::cube::piece::position::CubePosition;
 use crate::cube::piece::face::Face;
 
-#[macro_use]
-pub mod position;
-
-#[macro_use]
-pub mod edge;
-
-#[macro_use]
-pub mod corner;
-
-//#[macro_export]
-//#[macro_use]
+#[macro_use] pub mod position;
+#[macro_use] pub mod edge;
+#[macro_use] pub mod corner;
 pub mod face;
 
 pub trait Piece: Debug + Display + Transpose {

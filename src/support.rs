@@ -17,7 +17,7 @@ macro_rules! array_collect {
 
 #[macro_export]
 macro_rules! tuple_map {
-    ($f: expr; $( $elem: expr ),*) => {
+    ($f:expr; $( $elem:expr ),*) => {
         ( $( $f($elem) ),* )
     };
 }

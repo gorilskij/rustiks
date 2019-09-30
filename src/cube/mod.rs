@@ -34,10 +34,10 @@ pub struct FaceMatrix([[Face; 3]; 3]);
 impl FaceMatrix {
     fn from(cube: &Cube, f: Face, d: Face, l: Face, u: Face, r: Face) -> Self {
         macro_rules! f {
-            ($f1: expr) => {
+            ($f1:expr) => {
                 cube.edge_at(pos!(f, $f1)).id_on(f)
             };
-            ($f1: expr, $f2: expr) => {
+            ($f1:expr, $f2:expr) => {
                 cube.corner_at(pos!(f, $f1, $f2)).id_on(f)
             };
         }
@@ -51,7 +51,7 @@ impl FaceMatrix {
 }
 
 macro_rules! impl_face_matrix_fmt {
-    ($trait: ty, $fmt: expr) => {
+    ($trait:ty, $fmt:expr) => {
         impl $trait for FaceMatrix {
             fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
                 for line in &self.0 {
@@ -210,17 +210,17 @@ impl Transpose for Cube {
 }
 
 macro_rules! impl_cube_fmt {
-    ($trait: ty, $fmt: expr) => {
+    ($trait:ty, $fmt:expr) => {
         impl $trait for Cube {
             fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
                 macro_rules! format_face {
-                    ($face: expr, $below: expr) => {
+                    ($face:expr, $below:expr) => {
                         format!($fmt, self.get_face_matrix(cpos!($face, $below)))
                     };
                 }
 
                 macro_rules! push_right {
-                    ($face: expr) => {
+                    ($face:expr) => {
                         $face.lines().map(|l| {
                             vec!["       ", l].join("")
                         }).collect::<Vec<_>>().join("\n");

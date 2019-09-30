@@ -5,7 +5,7 @@ use super::piece::face::Face;
 
 #[macro_export]
 macro_rules! alg {
-    ($str: expr) => {
+    ($str:expr) => {
         crate::cube::algorithm::Algorithm::from($str)
     };
 }

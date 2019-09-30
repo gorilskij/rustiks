@@ -8,6 +8,7 @@ use piece::position::{EdgePosition, CornerPosition};
 use itertools::Itertools;
 use crate::cube::algorithm::{Algorithm, Move};
 use crate::cube::piece::Piece;
+use crate::cube::piece::position::CubePosition;
 
 #[macro_use]
 pub mod piece;
@@ -18,55 +19,36 @@ mod resort;
 #[macro_use]
 pub mod algorithm;
 
-#[derive(PartialEq)]
+mod manipulation;
+
+#[derive(PartialEq, Copy, Clone)]
 pub struct Cube {
     edges: [Edge; 12],
     corners: [Corner; 8],
 }
 
-macro_rules! collect_edges {
-    ($iter:expr) => { array_collect!($iter, [Edge; 12]) }
-}
-
-macro_rules! collect_corners {
-    ($iter:expr) => { array_collect!($iter, [Corner; 8]) }
-}
-
 pub struct FaceMatrix([[Face; 3]; 3]);
 
-impl Display for FaceMatrix {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "{}",
-               self.0
-                   .iter()
-                   .map(|line| format!("{} {} {}", line[0], line[1], line[2]))
-                   .join("\n")
-        )
-    }
+macro_rules! impl_face_matrix_fmt {
+    ($trait: ty, $fmt: expr) => {
+        impl $trait for FaceMatrix {
+            fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+                for line in &self.0 {
+                    writeln!(f, $fmt, line[0], line[1], line[2])?
+                }
+                Ok(())
+            }
+        }
+    };
 }
 
-impl Debug for FaceMatrix {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "{}",
-               self.0
-                   .iter()
-                   .map(|line|
-                       line
-                           .iter()
-                           .map(|f| format!("{:?}", f))
-                           .join(" ")
-                   )
-                   .join("\n")
-        )
-    }
-}
+impl_face_matrix_fmt!(Display, "{} {} {}");
+impl_face_matrix_fmt!(Debug, "{:?} {:?} {:?}");
 
 impl Cube {
     // this method is generally ugly both visually and in implementation
     // TODO: remove stink
     pub fn solved() -> Self {
-        // note: lets come first because otherwise a "freed while in use"
-        // error is thrown, I think arrays aren't IntoIterator TODO: check
         let edges_on_0 = Face::from(0).adjacent_edges();
         let edges_on_3 = Face::from(3).adjacent_edges();
         let edges_around = [
@@ -88,10 +70,10 @@ impl Cube {
             .chain(&corners_on_3)
             .map(|c| *c);
 
-        let edges = collect_edges!(edges);
-        let corners = collect_corners!(corners);
-
-        Self { edges, corners }
+        Self {
+            edges: array_collect!(edges, [Edge; 12]),
+            corners: array_collect!(corners, [Corner; 8]),
+        }
     }
 
     pub fn is_solved(&self) -> bool {
@@ -112,39 +94,36 @@ impl Cube {
         }
     }
 
-    pub fn get_face<F: Into<Face>>(&self, face: F, below: F) -> FaceMatrix {
-        let position = cpos!(below, face);
+    pub fn corner_at_mut(&mut self, position: CornerPosition) -> &mut Corner {
+        match self.corners.iter_mut().find(|c| c.is_at(position)) {
+            Some(c) => c,
+            None => unreachable!("no corner at {:?}", position)
+        }
+    }
 
-//        println!("{:?}", position);
+    pub fn get_face(&self, position: CubePosition) -> FaceMatrix {
+        let CubePosition { front: f, bottom: d } = position;
 
-//        println!("[5, 2, 0, 3, 1, 4]");
+        let mut adjacent_clockwise = f.adjacent_clockwise();
+        let mid = adjacent_clockwise.iter()
+            .position(|x| *x == d).unwrap();
+        adjacent_clockwise.rotate_left(mid);
 
-        // basic assumptions:
-        let f = Face::from(5).transposed_from_default(position);
-        let b = Face::from(2).transposed_from_default(position);
-        let d = Face::from(0).transposed_from_default(position);
-        let u = Face::from(3).transposed_from_default(position);
-        let l = Face::from(1).transposed_from_default(position);
-        let r = Face::from(4).transposed_from_default(position);
+        let [d, l, u, r] = adjacent_clockwise;
 
-//        println!("{:?}", [f,b,d,u,l,r]);
+        macro_rules! at_on {
+            ($f0: expr, $f1: expr) => {
+                self.edge_at(pos!($f0, $f1)).id_on(f)
+            };
+            ($f0: expr, $f1: expr, $f2: expr) => {
+                self.corner_at(pos!($f0, $f1, $f2)).id_on(f)
+            };
+        }
 
         FaceMatrix([
-            [
-                self.corner_at((f, l, u).into()).id_on(f),
-                self.edge_at((f, u).into()).id_on(f),
-                self.corner_at((f, r, u).into()).id_on(f),
-            ],
-            [
-                self.edge_at((f, l).into()).id_on(f),
-                f,
-                self.edge_at((f, r).into()).id_on(f),
-            ],
-            [
-                self.corner_at((f, l, d).into()).id_on(f),
-                self.edge_at((f, d).into()).id_on(f),
-                self.corner_at((f, r, d).into()).id_on(f),
-            ]
+            [at_on!(f, l, u), at_on!(f, u), at_on!(f, r, u)],
+            [at_on!(f, l)   , f           , at_on!(f, r)   ],
+            [at_on!(f, l, d), at_on!(f, d), at_on!(f, r, d)],
         ])
     }
 
@@ -223,11 +202,11 @@ macro_rules! impl_cube_fmt {
             fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
                 macro_rules! format_face {
                     ($face: expr, $below: expr) => {
-                        format!($fmt, self.get_face($face, $below))
+                        format!($fmt, self.get_face(cpos!($face, $below)))
                     };
                 }
 
-                macro_rules! push_face {
+                macro_rules! push_right {
                     ($face: expr) => {
                         $face.lines().map(|l| {
                             vec!["       ", l].join("")
@@ -235,25 +214,33 @@ macro_rules! impl_cube_fmt {
                     }
                 }
 
-                let face0 = push_face!(format_face!(0, 2));
-                let face1 = format_face!(1, 3);
-                let face2 = format_face!(2, 3);
-                let face3 = push_face!(format_face!(3, 5));
-                let face4 = format_face!(4, 3);
-                let face5 = format_face!(5, 3);
+                // FACES (for printing purposes)
+                //   a
+                // b c d e
+                //   f
+                // ACTUAL FACES (current representation)
+                //   3
+                // 5 1 2 4
+                //   0
 
-                let central_band = face1
-                    .lines()
-                    .zip(face2.lines())
-                    .zip(face4.lines())
-                    .zip(face5.lines())
-                    .map(|(((l1, l2), l4), l5)|
-                        vec![l1, l2, l4, l5].join("  ")
+                let face_a = push_right!(format_face!(0, 1));
+                let face_b = format_face!(5, 3);
+                let face_c = format_face!(1, 3);
+                let face_d = format_face!(2, 3);
+                let face_e = format_face!(4, 3);
+                let face_f = push_right!(format_face!(3, 4));
+
+                let central_band = face_b.lines()
+                    .zip(face_c.lines())
+                    .zip(face_d.lines())
+                    .zip(face_e.lines())
+                    .map(|(((b, c), d), e)|
+                        vec![b, c, d, e].join("  ")
                     ).join("\n");
 
-                writeln!(f, "{}\n", face0)?;
+                writeln!(f, "{}\n", face_a)?;
                 writeln!(f, "{}\n", central_band)?;
-                writeln!(f, "{}", face3)
+                writeln!(f, "{}", face_f)
             }
         }
     }

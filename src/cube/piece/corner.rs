@@ -20,8 +20,8 @@ macro_rules! corner {
 
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub struct Corner {
-    id: CornerPosition,
-    pos: CornerPosition,
+    pub id: CornerPosition,
+    pub pos: CornerPosition,
 }
 
 impl Corner {

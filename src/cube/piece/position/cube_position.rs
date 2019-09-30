@@ -8,6 +8,8 @@ pub struct CubePosition {
     pub bottom: Face,
 }
 
+// TODO: re-privatize fields and check validity on creation
+// TODO: also for EdgePosition and CornerPosition
 impl CubePosition {
     pub fn projection(&self) -> [Face; 6] {
         let mut mid = self.front.adjacent_clockwise();
@@ -42,11 +44,3 @@ impl Display for CubePosition {
         write!(f, "<f{}b{}>", self.front, self.bottom)
     }
 }
-
-//macro_rules! as_edge_position {
-//    ($self: ty, $method: ident ( $( $arg: ident : $type: ty ),* ) $( -> $rt: ty )?) => {
-//        pub fn $method(self: $self, $( $arg ),* ) $( -> $rt )? {
-//            let edge = EdgePosition(self.front, self.bottom)
-//        }
-//    };
-//}

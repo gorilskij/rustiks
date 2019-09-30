@@ -21,7 +21,7 @@ macro_rules! edge {
 #[derive(Copy, Clone, Eq, PartialEq)]
 pub struct Edge {
     id: EdgePosition,
-    pos: EdgePosition,
+    pub(crate) pos: EdgePosition,
 }
 
 impl Edge {

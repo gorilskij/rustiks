@@ -17,10 +17,10 @@ macro_rules! pos {
 
 #[macro_export]
 macro_rules! cpos {
-    ($f0: expr, $f1: expr) => {
+    ($front: expr, $bottom: expr) => {
         crate::cube::piece::position::CubePosition {
-            front: $f0.into(),
-            bottom: $f1.into(),
+            front: $front.into(),
+            bottom: $bottom.into(),
         }
     };
 }

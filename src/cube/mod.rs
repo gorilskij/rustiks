@@ -21,14 +21,34 @@ mod resort;
 pub mod algorithm;
 
 mod manipulation;
+mod color;
 
-#[derive(PartialEq, Copy, Clone)]
+#[derive(Eq, PartialEq, Copy, Clone)]
 pub struct Cube {
     edges: [Edge; 12],
     corners: [Corner; 8],
 }
 
 pub struct FaceMatrix([[Face; 3]; 3]);
+
+impl FaceMatrix {
+    fn from(cube: &Cube, f: Face, d: Face, l: Face, u: Face, r: Face) -> Self {
+        macro_rules! f {
+            ($f1: expr) => {
+                cube.edge_at(pos!(f, $f1)).id_on(f)
+            };
+            ($f1: expr, $f2: expr) => {
+                cube.corner_at(pos!(f, $f1, $f2)).id_on(f)
+            };
+        }
+
+        Self([
+            [f!(l, u), f!(u), f!(r, u)],
+            [f!(l)   , f    , f!(r)   ],
+            [f!(l, d), f!(d), f!(r, d)],
+        ])
+    }
+}
 
 macro_rules! impl_face_matrix_fmt {
     ($trait: ty, $fmt: expr) => {
@@ -43,8 +63,8 @@ macro_rules! impl_face_matrix_fmt {
     };
 }
 
-impl_face_matrix_fmt!(Display, "{} {} {}");
 impl_face_matrix_fmt!(Debug, "{:?} {:?} {:?}");
+impl_face_matrix_fmt!(Display, "{} {} {}");
 
 impl Cube {
     pub fn solved() -> Self {
@@ -104,8 +124,8 @@ impl Cube {
         }
     }
 
-    pub fn get_face(&self, position: CubePosition) -> FaceMatrix {
-        let CubePosition { front: f, bottom: d } = position;
+    fn get_face_matrix(&self, position: CubePosition) -> FaceMatrix {
+        let CubePosition { front: f, down: d } = position;
 
         let mut adjacent_clockwise = f.adjacent_clockwise();
         let mid = adjacent_clockwise.iter()
@@ -114,20 +134,7 @@ impl Cube {
 
         let [d, l, u, r] = adjacent_clockwise;
 
-        macro_rules! at_on {
-            ($f0: expr, $f1: expr) => {
-                self.edge_at(pos!($f0, $f1)).id_on(f)
-            };
-            ($f0: expr, $f1: expr, $f2: expr) => {
-                self.corner_at(pos!($f0, $f1, $f2)).id_on(f)
-            };
-        }
-
-        FaceMatrix([
-            [at_on!(f, l, u), at_on!(f, u), at_on!(f, r, u)],
-            [at_on!(f, l)   , f           , at_on!(f, r)   ],
-            [at_on!(f, l, d), at_on!(f, d), at_on!(f, r, d)],
-        ])
+        FaceMatrix::from(self, f, d, l, u, r)
     }
 
     fn apply_move(&mut self, m: &Move) {
@@ -208,7 +215,7 @@ macro_rules! impl_cube_fmt {
             fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
                 macro_rules! format_face {
                     ($face: expr, $below: expr) => {
-                        format!($fmt, self.get_face(cpos!($face, $below)))
+                        format!($fmt, self.get_face_matrix(cpos!($face, $below)))
                     };
                 }
 
@@ -225,9 +232,9 @@ macro_rules! impl_cube_fmt {
                 // b c d e
                 //   f
                 // ACTUAL FACES (current representation)
-                //   3
-                // 5 1 2 4
                 //   0
+                // 5 1 2 4
+                //   3
 
                 let face_a = push_right!(format_face!(0, 1));
                 let face_b = format_face!(5, 3);

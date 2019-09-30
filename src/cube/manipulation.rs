@@ -3,6 +3,8 @@ use crate::cube::piece::position::{CornerPosition, EdgePosition};
 use crate::cube::resort::Resort;
 
 // TODO: remove pub s
+// manipulation (for internal use)
+#[allow(dead_code)]
 impl Cube {
     pub fn flip_edges_at(&mut self, edge0: EdgePosition, edge1: EdgePosition) {
         let mut flipped = 0;
@@ -20,7 +22,7 @@ impl Cube {
     }
 
     pub fn rotate_corner_clockwise_illegal(&mut self, position: CornerPosition, rotations: u8) {
-        assert!(0 < rotations && rotations < 3, "illegal rotations: {}", rotations);
+        assert!(rotations == 1 || rotations == 2, "illegal rotations: {}", rotations);
 
         let mut corner = self.corner_at_mut(position);
         let CornerPosition(f0, f1, f2) = corner.id;
@@ -45,9 +47,8 @@ impl Cube {
         &mut self,
         clockwise: CornerPosition,
         anti_clockwise: CornerPosition,
-        rotations: u8,
     ) {
-        self.rotate_corner_clockwise_illegal(clockwise, rotations);
-        self.rotate_corner_clockwise_illegal(anti_clockwise, 3 - rotations);
+        self.rotate_corner_clockwise_illegal(clockwise, 1);
+        self.rotate_corner_clockwise_illegal(anti_clockwise, 2);
     }
 }

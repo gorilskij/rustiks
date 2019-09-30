@@ -5,7 +5,7 @@ use std::iter::once;
 #[derive(Copy, Clone)]
 pub struct CubePosition {
     pub front: Face,
-    pub bottom: Face,
+    pub down: Face,
 }
 
 // TODO: re-privatize fields and check validity on creation
@@ -17,7 +17,7 @@ impl CubePosition {
         let len = mid.len();
         let index = mid
             .iter()
-            .position(|x| *x == self.bottom)
+            .position(|x| *x == self.down)
             .unwrap();
 
         mid.rotate_left((index + 3) % len);
@@ -34,13 +34,13 @@ impl CubePosition {
 }
 
 impl Debug for CubePosition {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        write!(f, "<f{:?}b{:?}>", self.front, self.bottom)
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        write!(f, "<f{:?}d{:?}>", self.front, self.down)
     }
 }
 
 impl Display for CubePosition {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), Error> {
-        write!(f, "<f{}b{}>", self.front, self.bottom)
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        write!(f, "<f{}d{}>", self.front, self.down)
     }
 }

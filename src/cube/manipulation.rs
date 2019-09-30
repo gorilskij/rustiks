@@ -1,8 +1,5 @@
 use crate::cube::Cube;
 use crate::cube::piece::position::{CornerPosition, EdgePosition};
-use crate::cube::piece::Piece;
-use crate::cube::piece::face::Face;
-use crate::support::IterDeref;
 use crate::cube::resort::Resort;
 
 // TODO: remove pub s

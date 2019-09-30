@@ -3,12 +3,13 @@ pub use piece::{edge::Edge, corner::Corner};
 use piece::face::Face;
 
 use std::fmt::{Debug, Formatter, Error, Display};
-use crate::cube::transpose::{Transpose, Projection, Transposed};
+use crate::cube::transpose::{Transpose, Projection};
 use piece::position::{EdgePosition, CornerPosition};
 use itertools::Itertools;
 use crate::cube::algorithm::{Algorithm, Move};
 use crate::cube::piece::Piece;
 use crate::cube::piece::position::CubePosition;
+use std::iter::once;
 
 #[macro_use]
 pub mod piece;
@@ -46,36 +47,38 @@ impl_face_matrix_fmt!(Display, "{} {} {}");
 impl_face_matrix_fmt!(Debug, "{:?} {:?} {:?}");
 
 impl Cube {
-    // this method is generally ugly both visually and in implementation
-    // TODO: remove stink
     pub fn solved() -> Self {
         let edges_on_0 = Face::from(0).adjacent_edges();
         let edges_on_3 = Face::from(3).adjacent_edges();
-        let edges_around = [
-            Edge::between(1, 2),
-            Edge::between(2, 4),
-            Edge::between(4, 5),
-            Edge::between(5, 1),
-        ];
 
-        let edges = edges_on_0.iter()
-            .chain(edges_on_3.iter())
+        let adjacent = Face::from(0).adjacent();
+        let edges_around_iter = adjacent.iter()
+            .map(|f| *f)
+            .chain(once(adjacent[0]))
+            .tuple_windows()
+            .map(|(f0, f1)| edge!(f0, f1));
+        let edges_around = array_collect!(edges_around_iter, [Edge; 4]);
+
+        let edges_iter = edges_on_0.iter()
+            .chain(&edges_on_3)
             .chain(&edges_around)
             .map(|e| *e);
 
         let corners_on_0 = Face::from(0).adjacent_corners();
         let corners_on_3 = Face::from(3).adjacent_corners();
 
-        let corners = corners_on_0.iter()
+        let corners_iter = corners_on_0.iter()
             .chain(&corners_on_3)
             .map(|c| *c);
 
         Self {
-            edges: array_collect!(edges, [Edge; 12]),
-            corners: array_collect!(corners, [Corner; 8]),
+            edges: array_collect!(edges_iter, [Edge; 12]),
+            corners: array_collect!(corners_iter, [Corner; 8]),
         }
     }
 
+    // TODO: have a global "solved" Cube always ready to copy or compare
+    #[allow(dead_code)]
     pub fn is_solved(&self) -> bool {
         *self == Self::solved()
     }
@@ -154,6 +157,7 @@ impl Cube {
             });
     }
 
+    #[allow(dead_code)]
     pub fn apply(&mut self, algorithm: &Algorithm) {
         for m in algorithm.iter() {
 //            println!("applying {:?}", m);
@@ -176,7 +180,9 @@ impl Cube {
             )
     }
     pub fn iter_edges_mut(&mut self) -> impl Iterator<Item=&mut Edge> { self.edges.iter_mut() }
-    pub fn iter_corners_mut(&mut self) -> impl Iterator<Item=&mut Corner> { self.corners.iter_mut() }
+    pub fn iter_corners_mut(&mut self) -> impl Iterator<Item=&mut Corner> {
+        self.corners.iter_mut()
+    }
 
     pub fn iter_pieces_on<F: Into<Face>>(&self, face: F) -> impl Iterator<Item=&dyn Piece> {
         let face = face.into();

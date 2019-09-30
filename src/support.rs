@@ -1,7 +1,5 @@
 use std::iter::Map;
-use crate::cube::piece::face::Face;
-use std::slice::Iter;
-use crate::cube;
+
 // TODO: implement this better
 #[macro_export]
 macro_rules! array_collect {

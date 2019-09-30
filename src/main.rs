@@ -6,8 +6,6 @@
 #[allow(unused_imports)] use std::process::exit;
 #[allow(unused_imports)] use crate::cube::piece::face::Face;
 #[allow(unused_imports)] use crate::cube::piece::Piece;
-use crate::support::IterDeref;
-use crate::cube::Corner;
 
 #[macro_use]
 mod support;

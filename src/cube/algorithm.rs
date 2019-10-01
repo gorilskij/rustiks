@@ -2,6 +2,7 @@ use itertools::Itertools;
 use std::fmt::{Display, Formatter, Error, Debug};
 use std::iter::FromIterator;
 use super::piece::face::Face;
+use std::hint::unreachable_unchecked;
 
 #[macro_export]
 macro_rules! alg {
@@ -24,7 +25,7 @@ impl From<char> for MoveType {
             'D' => MoveType::D,
             'F' => MoveType::F,
             'B' => MoveType::B,
-            _ => panic!("invalid move type '{}'", c)
+            _ => panic!("invalid move type '{}'", c),
         }
     }
 }
@@ -65,7 +66,7 @@ impl From<&str> for Move {
             None => 1,
             Some('2') => 2,
             Some('\'') => 3,
-            Some(c) => panic!("invalid character '{}' as move quantifier", c)
+            Some(c) => panic!("invalid character '{}' as move quantifier", c),
         };
 
         Self(move_type, quantifier)
@@ -78,7 +79,7 @@ impl Move {
             1 => 3,
             2 => 2,
             3 => 1,
-            _ => panic!()
+            _ => unsafe { unreachable_unchecked() }
         })
     }
 
@@ -89,12 +90,12 @@ impl Move {
     // TODO: maybe implement some cube state where 'R' isn't always the same face
     pub fn face(&self) -> Face {
         match self.0 {
-            MoveType::D => 3,
-            MoveType::L => 1,
-            MoveType::B => 5,
             MoveType::U => 0,
-            MoveType::R => 4,
-            MoveType::F => 2,
+            MoveType::L => 5,
+            MoveType::F => 1,
+            MoveType::R => 2,
+            MoveType::B => 4,
+            MoveType::D => 3,
         }.into()
     }
 
@@ -109,7 +110,7 @@ impl Display for Move {
             1 => "",
             2 => "2",
             3 => "'",
-            _ => panic!()
+            _ => unsafe { unreachable_unchecked() }
         })
     }
 }
@@ -138,12 +139,11 @@ impl FromIterator<Move> for Algorithm {
 #[allow(dead_code)]
 impl Algorithm {
     pub fn reversed(&self) -> Self {
-        let mut move_reversed = self.0
+        let reversed_iter = self.0
             .iter()
-            .map(|m| m.reversed())
-            .collect::<Vec<_>>();
-        move_reversed.reverse();
-        Self(move_reversed)
+            .rev()
+            .map(|m| m.reversed());
+        Self(reversed_iter.collect())
     }
 
     pub fn simplified(&self) -> Self {
@@ -178,7 +178,7 @@ impl Algorithm {
                             base_sum = (base_sum + m.1) % 4,
                         t if t == opposite_move =>
                             opposite_sum = (opposite_sum + m.1) % 4,
-                        _ => panic!()
+                        _ => unsafe { unreachable_unchecked() }
                     }
                 }
 
@@ -187,6 +187,7 @@ impl Algorithm {
                 if base_sum != 0 { vec.push(Move(base_move, base_sum)) }
                 if opposite_sum != 0 { vec.push(Move(base_move.opposite(), opposite_sum)) }
 
+                // e.g. "U F F' U'" => "U U'" requires another pass
                 if base_sum == 0 && opposite_sum == 0 { another_pass = true }
 
                 vec
@@ -197,37 +198,28 @@ impl Algorithm {
         // possible recursive second pass for situations like (R U U' R')
         if another_pass { processed.simplified() } else { processed }
     }
-
-    pub fn iter(&self) -> AlgorithmIterator {
-        AlgorithmIterator(0, &self.0)
-    }
-}
-
-impl Debug for Algorithm {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "{}", self.0.iter().join(" "))
-    }
 }
 
 impl IntoIterator for Algorithm {
     type Item = Move;
-    type IntoIter = std::vec::IntoIter<Self::Item>;
+    type IntoIter = <Vec<Move> as IntoIterator>::IntoIter;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
     }
 }
 
-pub struct AlgorithmIterator<'a>(usize, &'a [Move]);
-
-impl<'a> Iterator for AlgorithmIterator<'a> {
+impl<'a> IntoIterator for &'a Algorithm {
     type Item = &'a Move;
+    type IntoIter = <&'a Vec<Move> as IntoIterator>::IntoIter;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.0 >= self.1.len() { return None }
+    fn into_iter(self) -> Self::IntoIter {
+        self.0.iter()
+    }
+}
 
-        let m = &self.1[self.0];
-        self.0 += 1;
-        Some(m)
+impl Debug for Algorithm {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        write!(f, "{}", self.0.iter().join(" "))
     }
 }

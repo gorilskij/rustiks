@@ -2,6 +2,7 @@ use crate::cube::Cube;
 use std::fmt::{Debug, Formatter, Error, Display};
 use colored::{Colorize, ColoredString};
 use itertools::Itertools;
+use std::hint::unreachable_unchecked;
 
 
 fn to_color(f: u8) -> ColoredString {
@@ -13,7 +14,7 @@ fn to_color(f: u8) -> ColoredString {
         4 => s.on_magenta(),
         5 => s.on_green(),
         3 => s.on_yellow(),
-        n => panic!("invalid face number: {}", n),
+        _ => unsafe { unreachable_unchecked() }
     }
 }
 
@@ -28,7 +29,8 @@ fn color_cube(uncolored: String) -> String {
         .replace("\n\n", "nn")
         .replace("\n", "\n\n")
         .replace("nn", "\n\n\n")
-        .replace(" ", "  ")
+        .replace(" ", "   ")
+        .replace("     ", "    ")
         .chars()
         .map(|c| {
             if c.is_numeric() {

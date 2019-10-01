@@ -66,8 +66,15 @@ macro_rules! impl_face_matrix_fmt {
 impl_face_matrix_fmt!(Debug, "{:?} {:?} {:?}");
 impl_face_matrix_fmt!(Display, "{} {} {}");
 
+// TODO: test printing
+// TODO: implement a way to numerically input a cube
+// TODO: implement a way to textually input a cube, test
+// TODO: test algorithm application on cube
+
+static mut SOLVED_CUBE: Option<Cube> = None;
+
 impl Cube {
-    pub fn solved() -> Self {
+    fn generate_solved() -> Self {
         let edges_on_0 = Face::from(0).adjacent_edges();
         let edges_on_3 = Face::from(3).adjacent_edges();
 
@@ -97,7 +104,15 @@ impl Cube {
         }
     }
 
-    // TODO: have a global "solved" Cube always ready to copy or compare
+    pub fn solved() -> Self {
+        unsafe {
+            if SOLVED_CUBE.is_none() {
+                SOLVED_CUBE = Some(Self::generate_solved())
+            }
+            SOLVED_CUBE.unwrap()
+        }
+    }
+
     #[allow(dead_code)]
     pub fn is_solved(&self) -> bool {
         *self == Self::solved()
@@ -128,8 +143,10 @@ impl Cube {
         let CubePosition { front: f, down: d } = position;
 
         let mut adjacent_clockwise = f.adjacent_clockwise();
-        let mid = adjacent_clockwise.iter()
-            .position(|x| *x == d).unwrap();
+        let mid = adjacent_clockwise
+            .iter()
+            .position(|x| *x == d)
+            .unwrap();
         adjacent_clockwise.rotate_left(mid);
 
         let [d, l, u, r] = adjacent_clockwise;
@@ -166,8 +183,7 @@ impl Cube {
 
     #[allow(dead_code)]
     pub fn apply(&mut self, algorithm: &Algorithm) {
-        for m in algorithm.iter() {
-//            println!("applying {:?}", m);
+        for m in algorithm {
             self.apply_move(m)
         }
     }
@@ -227,33 +243,24 @@ macro_rules! impl_cube_fmt {
                     }
                 }
 
-                // FACES (for printing purposes)
-                //   a
-                // b c d e
-                //   f
-                // ACTUAL FACES (current representation)
+                // current representation
                 //   0
                 // 5 1 2 4
                 //   3
 
-                let face_a = push_right!(format_face!(0, 1));
-                let face_b = format_face!(5, 3);
-                let face_c = format_face!(1, 3);
-                let face_d = format_face!(2, 3);
-                let face_e = format_face!(4, 3);
-                let face_f = push_right!(format_face!(3, 4));
+                writeln!(f, "{}\n", push_right!(format_face!(0, 1)))?;
 
-                let central_band = face_b.lines()
-                    .zip(face_c.lines())
-                    .zip(face_d.lines())
-                    .zip(face_e.lines())
+                let central_band = format_face!(5, 3).lines()
+                    .zip(format_face!(1, 3).lines())
+                    .zip(format_face!(2, 3).lines())
+                    .zip(format_face!(4, 3).lines())
                     .map(|(((b, c), d), e)|
                         vec![b, c, d, e].join("  ")
                     ).join("\n");
 
-                writeln!(f, "{}\n", face_a)?;
                 writeln!(f, "{}\n", central_band)?;
-                writeln!(f, "{}", face_f)
+
+                writeln!(f, "{}", push_right!(format_face!(3, 4)))
             }
         }
     }

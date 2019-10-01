@@ -24,7 +24,7 @@ impl EdgePosition {
         match face {
             f if f == self.0 => self.1,
             f if f == self.1 => self.0,
-            _ => panic!(),
+            f => panic!("face {:?} not in EdgePosition", f),
         }
     }
 }

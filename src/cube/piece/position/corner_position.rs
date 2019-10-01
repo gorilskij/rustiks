@@ -23,7 +23,7 @@ impl CornerPosition {
             f if f == self.0 => (self.1, self.2),
             f if f == self.1 => (self.0, self.2),
             f if f == self.2 => (self.1, self.2),
-            _ => panic!(),
+            f => panic!("face {:?} not in CornerPosition", f),
         }
     }
 }

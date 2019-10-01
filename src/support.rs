@@ -23,30 +23,6 @@ macro_rules! tuple_map {
 }
 
 #[allow(dead_code)]
-pub struct Lazy<T>(Option<T>);
-
-#[allow(dead_code)]
-impl<T> Lazy<T> {
-    pub const fn new() -> Self {
-        Self(None)
-    }
-
-    pub fn set(&mut self, value: T) {
-        match self.0 {
-            Some(_) => panic!("Lazy already has a value"),
-            None => self.0 = Some(value)
-        }
-    }
-
-    pub fn get(&self) -> &T {
-        match self.0 {
-            None => panic!("Lazy doesn't have a value"),
-            Some(ref value) => value
-        }
-    }
-}
-
-#[allow(dead_code)]
 pub trait IterDeref<'a, T: 'a + Copy> where Self: Iterator<Item=&'a T> + Sized {
     fn d(self) -> Map<Self, fn(&T) -> T>;
 }

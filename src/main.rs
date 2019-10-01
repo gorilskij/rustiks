@@ -18,10 +18,12 @@ fn main() {
 //    println!("{}", Cube::solved());
 //    println!("{}", Cube::solved().colored());
     let mut cube = Cube::solved();
+    cube.apply(&alg!("U"));
+    println!("{}", cube.colored());
 
-    cube.rotate_corners_at(pos!(0, 1, 2), pos!(3, 4, 5));
-    cube.flip_edges_at(pos!(1, 5), pos!(1, 3));
-    println!("{:?}", cube.colored());
-    cube.transpose(cpos!(1,3), cpos!(2,3));
-    println!("{:?}", cube.colored());
+//    cube.rotate_corners_at(pos!(0, 1, 2), pos!(3, 4, 5));
+//    cube.flip_edges_at(pos!(1, 5), pos!(1, 3));
+//    println!("{:?}", cube.colored());
+//    cube.transpose(cpos!(1,3), cpos!(2,3));
+//    println!("{:?}", cube.colored());
 }

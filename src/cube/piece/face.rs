@@ -2,7 +2,10 @@ use crate::cube::transpose::{Transpose, Projection};
 use std::fmt::{Display, Formatter, Error, Debug};
 use std::ops::{Add, Sub};
 use crate::cube::piece::{edge::Edge, corner::Corner};
+use std::hint::unreachable_unchecked;
 
+// TODO: consider converting to an enum
+// TODO: or writing a strong tie between front, back, ... and 0, 1, ...
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
 pub struct Face(u8);
 
@@ -106,12 +109,12 @@ impl Display for Face {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(f, "{}", match self.0 {
             0 => "W",
-            1 => "G",
-            2 => "R",
+            1 => "R",
+            2 => "B",
             3 => "Y",
-            4 => "B",
-            5 => "O",
-            x => panic!("Face has inner value {}", x)
+            4 => "O",
+            5 => "G",
+            _ => unsafe { unreachable_unchecked() },
         })
     }
 }

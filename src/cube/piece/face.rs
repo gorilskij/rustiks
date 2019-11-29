@@ -2,7 +2,6 @@ use crate::cube::transpose::{Transpose, Projection};
 use std::fmt::{Display, Formatter, Error, Debug};
 use std::ops::{Add, Sub};
 use crate::cube::piece::{edge::Edge, corner::Corner};
-use std::hint::unreachable_unchecked;
 
 // TODO: consider converting to an enum
 // TODO: or writing a strong tie between front, back, ... and 0, 1, ...
@@ -114,7 +113,7 @@ impl Display for Face {
             3 => "Y",
             4 => "O",
             5 => "G",
-            _ => unsafe { unreachable_unchecked() },
+            _ => unreachable!(),
         })
     }
 }

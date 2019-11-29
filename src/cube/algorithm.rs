@@ -2,7 +2,6 @@ use itertools::Itertools;
 use std::fmt::{Display, Formatter, Error, Debug};
 use std::iter::FromIterator;
 use super::piece::face::Face;
-use std::hint::unreachable_unchecked;
 
 #[macro_export]
 macro_rules! alg {
@@ -79,7 +78,7 @@ impl Move {
             1 => 3,
             2 => 2,
             3 => 1,
-            _ => unsafe { unreachable_unchecked() }
+            _ => unreachable!()
         })
     }
 
@@ -110,7 +109,7 @@ impl Display for Move {
             1 => "",
             2 => "2",
             3 => "'",
-            _ => unsafe { unreachable_unchecked() }
+            _ => unreachable!()
         })
     }
 }
@@ -178,7 +177,7 @@ impl Algorithm {
                             base_sum = (base_sum + m.1) % 4,
                         t if t == opposite_move =>
                             opposite_sum = (opposite_sum + m.1) % 4,
-                        _ => unsafe { unreachable_unchecked() }
+                        _ => unreachable!()
                     }
                 }
 

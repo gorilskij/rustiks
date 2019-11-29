@@ -18,7 +18,7 @@ fn main() {
 //    println!("{}", Cube::solved());
 //    println!("{}", Cube::solved().colored());
     let mut cube = Cube::solved();
-    cube.apply(&alg!("U"));
+    cube.apply(&alg!("U R R' U'"));
     println!("{}", cube.colored());
 
 //    cube.rotate_corners_at(pos!(0, 1, 2), pos!(3, 4, 5));

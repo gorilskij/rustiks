@@ -2,6 +2,8 @@ use itertools::Itertools;
 use std::fmt::{Display, Formatter, Error, Debug};
 use std::iter::FromIterator;
 use super::piece::face::Face;
+use serde::{Deserialize, Serialize, Serializer, Deserializer};
+use serde::de::{self, Visitor};
 
 #[macro_export]
 macro_rules! alg {
@@ -220,5 +222,34 @@ impl<'a> IntoIterator for &'a Algorithm {
 impl Debug for Algorithm {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(f, "{}", self.0.iter().join(" "))
+    }
+}
+
+impl Serialize for Algorithm {
+    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
+        where S: Serializer {
+        return serializer.serialize_str(&format!("{:?}", self))
+    }
+}
+
+struct StrVisitor;
+
+impl<'de> Visitor<'de> for StrVisitor {
+    type Value = String;
+
+    fn expecting(&self, formatter: &mut Formatter) -> Result<(), Error> {
+        write!(formatter, "a valid algorithm")
+    }
+
+    fn visit_str<E>(self, value: &str) -> Result<Self::Value, E> where E: de::Error {
+        Ok(value.to_string())
+    }
+}
+
+impl<'de> Deserialize<'de> for Algorithm {
+    fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error> where
+        D: Deserializer<'de> {
+        deserializer.deserialize_str(StrVisitor).map(|s|
+            Algorithm::from(s.as_str()))
     }
 }

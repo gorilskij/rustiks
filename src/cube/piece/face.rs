@@ -2,10 +2,11 @@ use crate::cube::transpose::{Transpose, Projection};
 use std::fmt::{Display, Formatter, Error, Debug};
 use std::ops::{Add, Sub};
 use crate::cube::piece::{edge::Edge, corner::Corner};
+use serde::Deserialize;
 
 // TODO: consider converting to an enum
 // TODO: or writing a strong tie between front, back, ... and 0, 1, ...
-#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq)]
+#[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Deserialize, Hash)]
 pub struct Face(u8);
 
 impl<T: Into<u8>> From<T> for Face {

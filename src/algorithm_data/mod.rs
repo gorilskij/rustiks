@@ -5,16 +5,20 @@ extern crate serde_json;
 use std::collections::HashMap;
 use crate::cube::piece::face::Face;
 use crate::support::Tern;
-use crate::cube::piece::position::EdgePosition;
+use crate::cube::piece::position::{EdgePosition, CornerPosition};
 use crate::cube::algorithm::Algorithm;
 use serde::Deserialize;
 use std::path::Path;
 use std::fs::File;
 use std::io::{Read, BufReader, BufRead};
-use std::str::Chars;
+use std::str::{Chars, FromStr};
 use itertools::Itertools;
 use std::ops::Index;
 use crate::support::IndexOf;
+use std::hash::Hash;
+use std::iter::FromIterator;
+use std::fmt::Debug;
+use std::process::exit;
 
 //#[derive(Deserialize)]
 //pub struct CrossAlg {
@@ -53,16 +57,23 @@ fn extract_algorithm(chars: &mut impl Iterator<Item=char>) -> Algorithm {
     Algorithm::from(alg)
 }
 
-fn split_at_first_space(s: &str) -> (&str, &str) {
-    let mut iter = s.splitn(2, ' ');
-    let exp = "failed to split at first space";
+fn split_at_first(s: &str, c: char) -> (&str, &str) {
+    let mut iter = s.splitn(2, c);
+    let exp = &format!("failed to split at first '{}'", c);
     (iter.next().expect(exp), iter.next().expect(exp))
+}
+
+pub trait PieceKey {
+    const LENGTH: usize;
+
+    fn from_char_iter(iter: impl Iterator<Item=char>) -> Self;
 }
 
 // NOTE: default_piece = [0,5]
 // NOTE: select = [0] TODO: what is this
-pub(crate) fn load_cross<P: AsRef<Path>>(path: P)
-    -> HashMap<EdgePosition, Tern<Vec<EdgePosition>, Algorithm>>
+pub(crate) fn load<P: AsRef<Path>, K>(path: P)
+    -> HashMap<K, Tern<Vec<K>, Algorithm>> where
+    K: PieceKey + Eq + Hash + Debug
 {
     let file = File::open(path).expect("failed to open file");
     let mut reader = BufReader::new(file);
@@ -75,20 +86,17 @@ pub(crate) fn load_cross<P: AsRef<Path>>(path: P)
         if &line == "///" { break }
         if line.starts_with("//") { continue }
 
-        let (piece, mut line) = split_at_first_space(&line);
-        let piece = piece.chars()
-            .map(|c| c.to_digit(10)
-                .expect(&format!("{} is not a valid integer", c)) as u8)
-            .collect::<EdgePosition>();
+        let (pieces, mut line) = split_at_first(&line, ':');
+        let pieces = K::from_char_iter(pieces.chars());
 
         let mut tern_vec =
-            Vec::<(Vec<EdgePosition>, Algorithm)>::with_capacity(10);
+            Vec::<(Vec<K>, Algorithm)>::with_capacity(10);
         while !line.is_empty() {
             let mut predicates = vec![];
             while line.chars().nth(0).unwrap().is_numeric() {
-                let (pred, rest) = line.split_at(2);
+                let (pred, rest) = line.split_at(K::LENGTH);
                 line = rest;
-                predicates.push(pred.chars().collect::<EdgePosition>())
+                predicates.push(K::from_char_iter(pred.chars()))
             }
 
             let end = line.index_of('"', 1)
@@ -106,8 +114,41 @@ pub(crate) fn load_cross<P: AsRef<Path>>(path: P)
             tern = Tern::Con(con, alg, Box::new(tern));
         }
 
-        map.insert(piece, tern).expect_none("Duplicate key in map");
+        if let Some(prev) = map.insert(pieces, tern) {
+            panic!("Duplicate key in map, previous value: {:?}", prev)
+        }
     }
 
     map
+}
+
+impl PieceKey for EdgePosition {
+    const LENGTH: usize = 2;
+
+    fn from_char_iter(iter: impl Iterator<Item=char>) -> Self {
+        iter.collect()
+    }
+}
+
+pub(crate) fn load_cross<P: AsRef<Path>>(path: P)
+    -> HashMap<EdgePosition, Tern<Vec<EdgePosition>, Algorithm>> {
+    load(path)
+}
+
+
+type CEPosition = (CornerPosition, EdgePosition);
+
+impl PieceKey for CEPosition {
+    const LENGTH: usize = 5;
+
+    fn from_char_iter(mut iter: impl Iterator<Item=char>) -> Self {
+        let c = (&mut iter).take(3).collect();
+        let e = iter.collect();
+        (c, e)
+    }
+}
+
+pub(crate) fn load_f2l<P: AsRef<Path>>(path: P)
+    -> HashMap<CEPosition, Tern<Vec<CEPosition>, Algorithm>> {
+    load(path)
 }

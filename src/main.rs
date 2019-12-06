@@ -8,7 +8,7 @@
 #[allow(unused_imports)] use crate::cube::piece::face::Face;
 #[allow(unused_imports)] use crate::cube::piece::Piece;
 
-extern crate serde_json;
+extern crate md5;
 
 #[macro_use]
 mod support;
@@ -21,6 +21,9 @@ mod algorithm_data;
 use std::fs::File;
 use std::io::Read;
 use algorithm_data::load_cross;
+use std::hash::Hash;
+use itertools::Itertools;
+use crate::algorithm_data::load_f2l;
 
 fn main() {
 //    println!("{}", Cube::solved());
@@ -31,11 +34,8 @@ fn main() {
 //        .expect("failed to open file")
 //        .read_to_string(&mut s);
 
-    let map = load_cross("src/algorithm_data/data/cross.txt");
-    println!("{:#?}", map);
-
-    let map = load_cross("src/algorithm_data/data/f2l.txt");
-    println!("{:#?}", map);
+    let cross = load_cross("src/algorithm_data/data/cross.txt");
+    let f2l = load_f2l("src/algorithm_data/data/f2l.txt");
 
 //    let ca: CrossAlg = serde_json::from_str(&s).expect("failed to deserialize");
 

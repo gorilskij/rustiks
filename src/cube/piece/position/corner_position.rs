@@ -1,8 +1,9 @@
 use crate::cube::piece::face::Face;
 use crate::cube::transpose::{Transpose, Projection};
 use std::fmt::{Debug, Display, Formatter, Error};
+use std::iter::FromIterator;
 
-#[derive(Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone, Eq, PartialEq, Hash)]
 pub struct CornerPosition(pub Face, pub Face, pub Face);
 
 impl<F: Into<Face>> From<(F, F, F)> for CornerPosition {
@@ -45,5 +46,13 @@ impl Debug for CornerPosition {
 impl Display for CornerPosition {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(f, "({} {} {})", self.0, self.1, self.2)
+    }
+}
+
+impl<A: Into<Face>> FromIterator<A> for CornerPosition {
+    fn from_iter<T: IntoIterator<Item=A>>(iter: T) -> Self {
+        let mut iter = iter.into_iter();
+        let exp = "Expected 3 values, got fewer";
+        pos!(iter.next().expect(exp), iter.next().expect(exp), iter.next().expect(exp))
     }
 }

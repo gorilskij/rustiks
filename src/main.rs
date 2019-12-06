@@ -20,10 +20,9 @@ mod test;
 mod algorithm_data;
 use std::fs::File;
 use std::io::Read;
-use algorithm_data::load_cross;
+use algorithm_data::{load_cross, load_f2l, load2};
 use std::hash::Hash;
 use itertools::Itertools;
-use crate::algorithm_data::load_f2l;
 
 fn main() {
 //    println!("{}", Cube::solved());
@@ -36,6 +35,8 @@ fn main() {
 
     let cross = load_cross("src/algorithm_data/data/cross.txt");
     let f2l = load_f2l("src/algorithm_data/data/f2l.txt");
+    let oll = load2("src/algorithm_data/data/oll.txt");
+    let pll = load2("src/algorithm_data/data/pll.txt");
 
 //    let ca: CrossAlg = serde_json::from_str(&s).expect("failed to deserialize");
 

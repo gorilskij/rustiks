@@ -22,6 +22,12 @@ use std::process::exit;
 
 const EXPECT_CHARS: &str = "chars ended earlier than expected";
 
+fn iter_lines<P: AsRef<Path>>(path: P) -> impl Iterator<Item=String> {
+    let file = File::open(path).expect("failed to open file");
+    let mut reader = BufReader::new(file);
+    reader.lines().map(|l| l.expect("failed to read line"))
+}
+
 fn extract_algorithm(chars: &mut impl Iterator<Item=char>) -> Algorithm {
     assert_eq!(chars.next().expect(EXPECT_CHARS), '"');
     let mut alg = String::new();
@@ -40,24 +46,25 @@ fn split_at_first(s: &str, c: char) -> (&str, &str) {
     (iter.next().expect(exp), iter.next().expect(exp))
 }
 
+fn safe_insert<K: Eq + Hash, V: Debug>(map: &mut HashMap<K, V>, k: K, v: V) {
+    if let Some(prev) = map.insert(k, v) {
+        panic!("Duplicate key in map, previous value: {:?}", prev)
+    }
+}
+
 pub trait PieceKey {
     const LENGTH: usize;
 
     fn from_char_iter(iter: impl Iterator<Item=char>) -> Self;
 }
 
-pub(crate) fn load<P: AsRef<Path>, K>(path: P)
-    -> HashMap<K, Tern<Vec<K>, Algorithm>> where
+pub(crate) fn load1<P: AsRef<Path>, K>(path: P)
+                                       -> HashMap<K, Tern<Vec<K>, Algorithm>> where
     K: PieceKey + Eq + Hash + Debug
 {
-    let file = File::open(path).expect("failed to open file");
-    let mut reader = BufReader::new(file);
-
     let mut map = HashMap::new();
 
-    for mut line in reader.lines()
-        .map(|l| l.expect("failed to read line")) {
-
+    for mut line in iter_lines(path) {
         if &line == "///" { break }
         if line.starts_with("//") { continue }
 
@@ -89,9 +96,7 @@ pub(crate) fn load<P: AsRef<Path>, K>(path: P)
             tern = Tern::Con(con, alg, Box::new(tern));
         }
 
-        if let Some(prev) = map.insert(pieces, tern) {
-            panic!("Duplicate key in map, previous value: {:?}", prev)
-        }
+        safe_insert(&mut map, pieces, tern)
     }
 
     map
@@ -107,7 +112,7 @@ impl PieceKey for EdgePosition {
 
 pub(crate) fn load_cross<P: AsRef<Path>>(path: P)
     -> HashMap<EdgePosition, Tern<Vec<EdgePosition>, Algorithm>> {
-    load(path)
+    load1(path)
 }
 
 
@@ -125,5 +130,20 @@ impl PieceKey for CEPosition {
 
 pub(crate) fn load_f2l<P: AsRef<Path>>(path: P)
     -> HashMap<CEPosition, Tern<Vec<CEPosition>, Algorithm>> {
-    load(path)
+    load1(path)
+}
+
+pub(crate) fn load2<P: AsRef<Path>>(path: P) -> HashMap<Vec<usize>, Algorithm> {
+    let mut map = HashMap::new();
+
+    for line in iter_lines(path) {
+        let (pred, alg) = split_at_first(&line, ':');
+        let pred = pred.split(',')
+            .map(|i| i.parse().expect(&format!("Invalid value for usize: {}" , i)))
+            .collect();
+        let alg = Algorithm::from(&alg[1..alg.len() - 1]);
+        safe_insert(&mut map, pred, alg);
+    }
+
+    map
 }

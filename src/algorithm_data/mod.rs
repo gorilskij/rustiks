@@ -20,30 +20,7 @@ use std::iter::FromIterator;
 use std::fmt::Debug;
 use std::process::exit;
 
-//#[derive(Deserialize)]
-//pub struct CrossAlg {
-//    piece: EdgePosition,
-//    select: Face, // TODO: understand what this is and rename it
-//    algorithms: HashMap<EdgePosition, Tern<Vec<EdgePosition>, Algorithm>>,
-//}
-
 const EXPECT_CHARS: &str = "chars ended earlier than expected";
-
-// char to u8
-fn c2u8(c: char) -> u8 {
-    c.to_digit(10).expect("not a valid base-10 digit") as u8
-}
-
-macro_rules! cpos {
-    ($c1:expr, $c2:expr) => { pos!(c2u8($c1), c2u8($c2)) };
-}
-
-fn extract_edge_position(chars: &mut impl Iterator<Item=char>) -> EdgePosition {
-    cpos!(
-        chars.next().expect(EXPECT_CHARS),
-        chars.next().expect(EXPECT_CHARS)
-    )
-}
 
 fn extract_algorithm(chars: &mut impl Iterator<Item=char>) -> Algorithm {
     assert_eq!(chars.next().expect(EXPECT_CHARS), '"');
@@ -69,8 +46,6 @@ pub trait PieceKey {
     fn from_char_iter(iter: impl Iterator<Item=char>) -> Self;
 }
 
-// NOTE: default_piece = [0,5]
-// NOTE: select = [0] TODO: what is this
 pub(crate) fn load<P: AsRef<Path>, K>(path: P)
     -> HashMap<K, Tern<Vec<K>, Algorithm>> where
     K: PieceKey + Eq + Hash + Debug

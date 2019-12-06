@@ -2,6 +2,7 @@ use crate::cube::piece::face::Face;
 use crate::cube::transpose::{Transpose, Projection};
 use std::fmt::{Debug, Display, Formatter, Error};
 use serde::Deserialize;
+use std::iter::FromIterator;
 
 #[derive(Copy, Clone, Eq, PartialEq, Deserialize, Hash)]
 pub struct EdgePosition(pub Face, pub Face);
@@ -46,5 +47,13 @@ impl Debug for EdgePosition {
 impl Display for EdgePosition {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(f, "({} {})", self.0, self.1)
+    }
+}
+
+impl<A: Into<Face>> FromIterator<A> for EdgePosition {
+    fn from_iter<T: IntoIterator<Item=A>>(iter: T) -> Self {
+        let mut iter = iter.into_iter();
+        let exp = "Expected 2 values, got fewer";
+        pos!(iter.next().expect(exp), iter.next().expect(exp))
     }
 }

@@ -9,9 +9,16 @@ use serde::Deserialize;
 #[derive(Copy, Clone, Ord, PartialOrd, Eq, PartialEq, Deserialize, Hash)]
 pub struct Face(u8);
 
-impl<T: Into<u8>> From<T> for Face {
-    fn from(value: T) -> Self {
-        Self::new(value.into())
+impl From<u8> for Face {
+    fn from(n: u8) -> Self {
+        Self::new(n)
+    }
+}
+
+impl From<char> for Face {
+    fn from(c: char) -> Self {
+        Self::new(c.to_digit(10)
+            .expect(&format!("{} is not a valid integer", c)) as u8)
     }
 }
 

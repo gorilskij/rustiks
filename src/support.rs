@@ -55,6 +55,16 @@ macro_rules! tern {
 
 #[allow(dead_code)]
 impl<C: PartialEq, R> Tern<C, R> {
+    fn create(mut conditions: Vec<(C, R)>, last: Self) -> Self {
+        if conditions.is_empty() { return last }
+        let c = conditions.pop().unwrap();
+        Self::create(conditions, Self::Con(c.0, c.1, Box::new(last)))
+    }
+
+    pub fn new(conditions: Vec<(C, R)>, last: R) -> Self {
+        Self::create(conditions, Self::End(last))
+    }
+
     pub fn eval(&self, input: &C) -> &R {
         match self {
             Tern::End(r) => r,
@@ -71,5 +81,21 @@ impl<C: PartialEq, R> Tern<C, R> {
 impl<C: PartialEq + Copy, R: Copy> Tern<C, R> {
     pub fn eval_owned(self, input: C) -> R {
         *self.eval(&input)
+    }
+}
+
+pub trait IndexOf {
+    fn index_of(&self, c: char, skip: usize) -> Option<usize>;
+}
+
+impl IndexOf for String {
+    fn index_of(&self, c: char, skip: usize) -> Option<usize> {
+        Some(self[skip..].find(c)? + skip)
+    }
+}
+
+impl IndexOf for str {
+    fn index_of(&self, c: char, skip: usize) -> Option<usize> {
+        self.to_string().index_of(c, skip)
     }
 }

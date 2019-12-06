@@ -125,11 +125,24 @@ impl Debug for Move {
 #[derive(Eq, PartialEq)]
 pub struct Algorithm(Vec<Move>);
 
-impl From<&str> for Algorithm {
-    fn from(s: &str) -> Self {
-        Self(s.split_whitespace().map(|s| Move::from(s)).collect())
+impl<S: AsRef<str>> From<S> for Algorithm {
+    fn from(s: S) -> Self {
+        Self(s.as_ref().split_whitespace().map(|s| Move::from(s)).collect())
     }
 }
+
+
+//impl From<&str> for Algorithm {
+//    fn from(s: &str) -> Self {
+//        Self(s.split_whitespace().map(|s| Move::from(s)).collect())
+//    }
+//}
+
+//impl From<String> for Algorithm {
+//    fn from(s: String) -> Self {
+//        Self::from(s.as_str())
+//    }
+//}
 
 impl FromIterator<Move> for Algorithm {
     fn from_iter<I: IntoIterator<Item=Move>>(iter: I) -> Self {

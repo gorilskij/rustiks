@@ -1,4 +1,5 @@
 #![allow(unused_macros)]
+#![feature(option_expect_none)]
 
 #[allow(unused_imports)] use cube::transpose::{Transpose, Transposed};
 #[allow(unused_imports)] use cube::Cube;
@@ -17,20 +18,26 @@ mod cube;
 mod test;
 
 mod algorithm_data;
+use std::fs::File;
+use std::io::Read;
+use algorithm_data::load_cross;
 
 fn main() {
 //    println!("{}", Cube::solved());
 //    println!("{}", Cube::solved().colored());
 
-    let alg = Algorithm::from("R U R' U'");
-    println!("{:?}", alg);
-    let ser = serde_json::to_string(&alg).unwrap();
-    println!("{}", ser.chars().next().unwrap());
-    println!("{:?}", ser);
-    let de: Algorithm = serde_json::from_str(&ser).unwrap();
-    println!("{:?}", de);
-    println!("{}", alg == de);
+//    let mut s = String::new();
+//    let text = File::open("src/algorithm_data/data/cross.txt")
+//        .expect("failed to open file")
+//        .read_to_string(&mut s);
 
+    let map = load_cross("src/algorithm_data/data/cross.txt");
+    println!("{:#?}", map);
+
+    let map = load_cross("src/algorithm_data/data/f2l.txt");
+    println!("{:#?}", map);
+
+//    let ca: CrossAlg = serde_json::from_str(&s).expect("failed to deserialize");
 
 //    let mut cube = Cube::solved();
 //    cube.apply(&alg!("U R R' U'"));

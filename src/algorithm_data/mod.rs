@@ -3,41 +3,21 @@ extern crate serde;
 extern crate serde_json;
 
 use std::collections::HashMap;
-use crate::cube::piece::face::Face;
 use crate::support::Tern;
 use crate::cube::piece::position::{EdgePosition, CornerPosition};
 use crate::cube::algorithm::Algorithm;
-use serde::Deserialize;
 use std::path::Path;
 use std::fs::File;
-use std::io::{Read, BufReader, BufRead};
-use std::str::{Chars, FromStr};
-use itertools::Itertools;
-use std::ops::Index;
+use std::io::{BufReader, BufRead};
 use crate::support::IndexOf;
 use std::hash::Hash;
-use std::iter::FromIterator;
 use std::fmt::Debug;
-use std::process::exit;
-
-const EXPECT_CHARS: &str = "chars ended earlier than expected";
+use std::mem;
 
 fn iter_lines<P: AsRef<Path>>(path: P) -> impl Iterator<Item=String> {
     let file = File::open(path).expect("failed to open file");
-    let mut reader = BufReader::new(file);
+    let reader = BufReader::new(file);
     reader.lines().map(|l| l.expect("failed to read line"))
-}
-
-fn extract_algorithm(chars: &mut impl Iterator<Item=char>) -> Algorithm {
-    assert_eq!(chars.next().expect(EXPECT_CHARS), '"');
-    let mut alg = String::new();
-    loop {
-        match chars.next().expect(EXPECT_CHARS) {
-            '"' => break,
-            c => alg.push(c),
-        }
-    }
-    Algorithm::from(alg)
 }
 
 fn split_at_first(s: &str, c: char) -> (&str, &str) {
@@ -64,7 +44,7 @@ pub(crate) fn load1<P: AsRef<Path>, K>(path: P)
 {
     let mut map = HashMap::new();
 
-    for mut line in iter_lines(path) {
+    for line in iter_lines(path) {
         if &line == "///" { break }
         if line.starts_with("//") { continue }
 
@@ -110,12 +90,6 @@ impl PieceKey for EdgePosition {
     }
 }
 
-pub(crate) fn load_cross<P: AsRef<Path>>(path: P)
-    -> HashMap<EdgePosition, Tern<Vec<EdgePosition>, Algorithm>> {
-    load1(path)
-}
-
-
 type CEPosition = (CornerPosition, EdgePosition);
 
 impl PieceKey for CEPosition {
@@ -128,12 +102,7 @@ impl PieceKey for CEPosition {
     }
 }
 
-pub(crate) fn load_f2l<P: AsRef<Path>>(path: P)
-    -> HashMap<CEPosition, Tern<Vec<CEPosition>, Algorithm>> {
-    load1(path)
-}
-
-pub(crate) fn load2<P: AsRef<Path>>(path: P) -> HashMap<Vec<usize>, Algorithm> {
+fn load2<P: AsRef<Path>>(path: P) -> HashMap<Vec<usize>, Algorithm> {
     let mut map = HashMap::new();
 
     for line in iter_lines(path) {
@@ -147,3 +116,30 @@ pub(crate) fn load2<P: AsRef<Path>>(path: P) -> HashMap<Vec<usize>, Algorithm> {
 
     map
 }
+
+
+// Data:
+fn lazy_get<'a, T>(data: &'a mut Option<T>, load: fn(&'a str) -> T, path: &'a str) -> &'a T {
+    if data.is_none() {
+        mem::replace(data, Some(load(path)));
+    }
+    data.as_ref().unwrap()
+}
+
+macro_rules! lazy_load {
+    ($const:ident, $fn:ident, $load:expr, $path:expr, $type:ty) => {
+        static mut $const: Option<$type> = None;
+        pub(crate) fn $fn() -> &'static $type {
+            unsafe { lazy_get(&mut $const, $load, $path) }
+        }
+    };
+}
+
+lazy_load!(CROSS_DATA, cross_data, load1, "src/algorithm_data/data/cross.txt",
+    HashMap<EdgePosition, Tern<Vec<EdgePosition>, Algorithm>>);
+lazy_load!(F2L_DATA, f2l_data, load1, "src/algorithm_data/data/f2l.txt",
+    HashMap<CEPosition, Tern<Vec<CEPosition>, Algorithm>>);
+lazy_load!(OLL_DATA, oll_data, load2, "src/algorithm_data/data/oll.txt",
+    HashMap<Vec<usize>, Algorithm>);
+lazy_load!(PLL_DATA, pll_data, load2, "src/algorithm_data/data/pll.txt",
+    HashMap<Vec<usize>, Algorithm>);

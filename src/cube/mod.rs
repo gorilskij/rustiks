@@ -22,6 +22,7 @@ pub mod algorithm;
 
 mod manipulation;
 mod color;
+mod solving;
 
 #[derive(Eq, PartialEq, Copy, Clone)]
 pub struct Cube {

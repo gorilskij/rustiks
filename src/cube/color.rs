@@ -56,6 +56,7 @@ impl<'a> Debug for ColoredCube<'a> {
     }
 }
 
+#[allow(dead_code)]
 impl Cube {
     pub fn colored(&self) -> ColoredCube {
         ColoredCube(self)

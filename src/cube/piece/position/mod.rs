@@ -32,3 +32,10 @@ mod corner_position;
 pub use cube_position::*;
 pub use edge_position::*;
 pub use corner_position::*;
+use std::hash::Hash;
+
+pub trait Position where Self: Hash {}
+
+impl Position for EdgePosition {}
+
+impl Position for CornerPosition {}

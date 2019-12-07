@@ -32,13 +32,13 @@ fn safe_insert<K: Eq + Hash, V: Debug>(map: &mut HashMap<K, V>, k: K, v: V) {
     }
 }
 
-pub trait PieceKey {
+trait PieceKey {
     const LENGTH: usize;
 
     fn from_char_iter(iter: impl Iterator<Item=char>) -> Self;
 }
 
-pub(crate) fn load1<P: AsRef<Path>, K>(path: P)
+fn load1<P: AsRef<Path>, K>(path: P)
                                        -> HashMap<K, Tern<Vec<K>, Algorithm>> where
     K: PieceKey + Eq + Hash + Debug
 {

@@ -4,6 +4,8 @@ use crate::cube::resort::Resort;
 use super::position::EdgePosition;
 use crate::cube::transpose::{Transpose, Projection};
 use std::fmt::{Display, Formatter, Error, Debug};
+use crate::cube::piece::position::Position;
+use std::hash::Hash;
 
 #[macro_export]
 macro_rules! edge {
@@ -31,8 +33,20 @@ impl Edge {
         edge
     }
 
+    pub fn is_solved(&self) -> bool {
+        self.id == self.pos
+    }
+
     pub fn is_at(&self, position: EdgePosition) -> bool {
         self.pos.sorted() == position.sorted()
+    }
+
+    pub fn has_id(&self, id: EdgePosition) -> bool {
+        self.id.sorted() == id.sorted()
+    }
+
+    pub fn id_contains(&self, face: Face) -> bool {
+        self.id.0 == face || self.id.1 == face
     }
 
     pub fn id_on(&self, pos_face: Face) -> Face {
@@ -89,13 +103,13 @@ impl Transpose for Edge {
 impl Display for Edge {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         let Self { id, pos } = self;
-        write!(f, "E[{}, {}]->({}, {})", id.0, id.1, pos.0, pos.1)
+        write!(f, "[{} {}]({} {})", id.0, id.1, pos.0, pos.1)
     }
 }
 
 impl Debug for Edge {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         let Self { id, pos } = self;
-        write!(f, "E[{:?}, {:?}]->({:?}, {:?})", id.0, id.1, pos.0, pos.1)
+        write!(f, "[{:?} {:?}]({:?} {:?})", id.0, id.1, pos.0, pos.1)
     }
 }

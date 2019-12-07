@@ -64,6 +64,10 @@ impl Face {
         Self(value)
     }
 
+    pub fn unwrap(self) -> u8 {
+        self.0
+    }
+
     pub fn is_even(self) -> bool {
         self.0 % 2 == 0
     }

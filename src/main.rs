@@ -38,18 +38,18 @@ fn main() {
 //        .expect("failed to open file")
 //        .read_to_string(&mut s);
 
-    cross_data();
-    f2l_data();
-    oll_data();
-    pll_data();
+//    cross_data();
+//    f2l_data();
+//    oll_data();
+//    pll_data();
 
-//    Cube::solved().solve();
-//    exit(0);
-
-//    let cross = load_cross("src/algorithm_data/data/cross.txt");
-//    let f2l = load_f2l("src/algorithm_data/data/f2l.txt");
-//    let oll = load2("src/algorithm_data/data/oll.txt");
-//    let pll = load2("src/algorithm_data/data/pll.txt");
+    let mut cube = Cube::solved();
+    cube.apply(&alg!("L R B U"));
+    println!("{}", cube.colored());
+    let solution = cube.solution();
+    println!("solution: {:?}", solution);
+    cube.apply(&solution);
+    println!("{}", cube.colored());
 
 //    let ca: CrossAlg = serde_json::from_str(&s).expect("failed to deserialize");
 

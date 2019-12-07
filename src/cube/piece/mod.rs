@@ -1,6 +1,6 @@
 use std::fmt::{Debug, Display};
 use crate::cube::transpose::{Transpose, Projection};
-use crate::cube::piece::position::CubePosition;
+use crate::cube::piece::position::{CubePosition, Position};
 use crate::cube::piece::face::Face;
 
 #[macro_use] pub mod position;

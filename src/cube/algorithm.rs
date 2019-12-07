@@ -4,6 +4,7 @@ use std::iter::FromIterator;
 use super::piece::face::Face;
 use serde::{Deserialize, Serialize, Serializer, Deserializer};
 use serde::de::{self, Visitor};
+use crate::cube::transpose::Transpose;
 
 #[macro_export]
 macro_rules! alg {
@@ -92,10 +93,10 @@ impl Move {
     pub fn face(&self) -> Face {
         match self.0 {
             MoveType::U => 0,
-            MoveType::L => 5,
-            MoveType::F => 1,
-            MoveType::R => 2,
-            MoveType::B => 4,
+            MoveType::L => 1,
+            MoveType::F => 5,
+            MoveType::R => 4,
+            MoveType::B => 2,
             MoveType::D => 3,
         }.into()
     }
@@ -122,7 +123,7 @@ impl Debug for Move {
     }
 }
 
-#[derive(Eq, PartialEq)]
+#[derive(Eq, PartialEq, Clone)]
 pub struct Algorithm(Vec<Move>);
 
 impl<S: AsRef<str>> From<S> for Algorithm {
@@ -152,6 +153,18 @@ impl FromIterator<Move> for Algorithm {
 
 #[allow(dead_code)]
 impl Algorithm {
+    pub fn new() -> Self {
+        Self(Vec::new())
+    }
+
+    pub fn len(&self) -> usize {
+        self.0.len()
+    }
+
+    pub fn push(&mut self, mut alg: Algorithm) {
+        self.0.append(&mut alg.0)
+    }
+
     pub fn reversed(&self) -> Self {
         let reversed_iter = self.0
             .iter()
@@ -264,5 +277,27 @@ impl<'de> Deserialize<'de> for Algorithm {
         D: Deserializer<'de> {
         deserializer.deserialize_str(StrVisitor).map(|s|
             Algorithm::from(s.as_str()))
+    }
+}
+
+// WARN: unfinished and probably wrong
+impl Transpose for Algorithm {
+    fn transpose_with_projection(&mut self, from: [Face; 6], to: [Face; 6]) {
+        const M: [MoveType; 6] = {
+            use MoveType::*;
+            [D, L, B, U, R, F] // TODO: understand where this is from
+        };
+
+        *self = self.0.iter().map(|mov| {
+            let index1 = Face::new(M.iter()
+                .position(|&m| m == mov.0)
+                .unwrap() as u8);
+
+            let index2 = from.iter()
+                .position(|&f| f == index1)
+                .unwrap();
+
+            Move(M[to[index2].unwrap() as usize], mov.1)
+        }).collect()
     }
 }

@@ -75,6 +75,18 @@ impl<C: PartialEq, R> Tern<C, R> {
             }
         }
     }
+
+    pub fn eval_by<F>(&self, f: F) -> &R where
+        F: Fn(&C) -> bool {
+        match self {
+            Tern::End(r) => r,
+            Tern::Con(c, r, b) => if f(c) {
+                r
+            } else {
+                b.eval_by(f)
+            }
+        }
+    }
 }
 
 #[allow(dead_code)]

@@ -169,7 +169,7 @@ impl Algorithm {
         let reversed_iter = self.0
             .iter()
             .rev()
-            .map(|m| m.reversed());
+            .map(Move::reversed);
         Self(reversed_iter.collect())
     }
 

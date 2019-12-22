@@ -91,7 +91,7 @@ impl Face {
     pub fn adjacent_edges(self) -> [Edge; 4] {
         let adjacent = self.adjacent();
         array_collect!(
-            adjacent.iter().map(|f| edge![*f, self]),
+            adjacent.iter().map(|&f| edge![f, self]),
             [Edge; 4]
         )
     }

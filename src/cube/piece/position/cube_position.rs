@@ -27,7 +27,7 @@ impl CubePosition {
         let iterator = once(&self.front)
             .chain(&mid)
             .chain(once(&opposite))
-            .map(|x| *x);
+            .copied();
 
         array_collect!(iterator, [Face; 6])
     }

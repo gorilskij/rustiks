@@ -81,7 +81,7 @@ impl Cube {
 
         let adjacent = Face::from(0).adjacent();
         let edges_around_iter = adjacent.iter()
-            .map(|f| *f)
+            .copied()
             .chain(once(adjacent[0]))
             .tuple_windows()
             .map(|(f0, f1)| edge!(f0, f1));
@@ -90,14 +90,14 @@ impl Cube {
         let edges_iter = edges_on_0.iter()
             .chain(&edges_on_3)
             .chain(&edges_around)
-            .map(|e| *e);
+            .copied();
 
         let corners_on_0 = Face::from(0).adjacent_corners();
         let corners_on_3 = Face::from(3).adjacent_corners();
 
         let corners_iter = corners_on_0.iter()
             .chain(&corners_on_3)
-            .map(|c| *c);
+            .copied();
 
         Self {
             edges: array_collect!(edges_iter, [Edge; 12]),

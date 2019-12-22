@@ -1,7 +1,6 @@
-use std::iter::Map;
-use serde::Deserialize;
-
 // TODO: implement this better
+//  consider implementing e.g. an Adjacent type that implements FromIterator
+//  instead of [Face; 4]
 #[macro_export]
 macro_rules! array_collect {
     ($iter:expr, [$type:ty; $len:expr]) => {{
@@ -24,19 +23,7 @@ macro_rules! tuple_map {
 }
 
 #[allow(dead_code)]
-pub trait IterDeref<'a, T: 'a + Copy> where Self: Iterator<Item=&'a T> + Sized {
-    fn d(self) -> Map<Self, fn(&T) -> T>;
-}
-
-#[allow(dead_code)]
-impl<'a, T: 'a + Copy, I> IterDeref<'a, T> for I where I: Iterator<Item=&'a T> {
-    fn d(self) -> Map<Self, fn(&T) -> T> {
-        self.map(|x: &T| *x)
-    }
-}
-
-#[allow(dead_code)]
-#[derive(Debug, Deserialize)]
+#[derive(Debug)]
 pub enum Tern<C: PartialEq, R> {
     End(R),
     Con(C, R, Box<Tern<C, R>>),

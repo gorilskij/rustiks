@@ -1,5 +1,4 @@
 #![allow(unused_macros)]
-#![feature(option_expect_none)]
 
 #[allow(unused_imports)] use cube::transpose::{Transpose, Transposed};
 #[allow(unused_imports)] use cube::Cube;

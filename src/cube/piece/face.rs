@@ -18,7 +18,7 @@ impl From<u8> for Face {
 impl From<char> for Face {
     fn from(c: char) -> Self {
         Self::new(c.to_digit(10)
-            .expect(&format!("{} is not a valid integer", c)) as u8)
+            .unwrap_or_else(|| panic!("{} is not a valid integer", c)) as u8)
     }
 }
 

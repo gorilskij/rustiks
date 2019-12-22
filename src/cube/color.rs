@@ -34,7 +34,7 @@ fn color_cube(uncolored: String) -> String {
             if c.is_numeric() {
                 to_color(c.to_string()
                     .parse()
-                    .expect(&format!("couldn't parse '{}' as u8", c))
+                    .unwrap_or_else(|_| panic!("couldn't parse '{}' as u8", c))
                 )
             } else {
                 c.to_string().normal()

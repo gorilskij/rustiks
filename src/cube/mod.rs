@@ -155,7 +155,7 @@ impl Cube {
         FaceMatrix::from(self, f, d, l, u, r)
     }
 
-    fn apply_move(&mut self, m: &Move) {
+    fn apply_move(&mut self, m: Move) {
         let (face, times) = (m.face(), m.times());
         let clockwise = face.adjacent_clockwise();
         self.edges
@@ -184,7 +184,7 @@ impl Cube {
 
     #[allow(dead_code)]
     pub fn apply(&mut self, algorithm: &Algorithm) {
-        for m in algorithm {
+        for &m in algorithm {
             self.apply_move(m)
         }
     }

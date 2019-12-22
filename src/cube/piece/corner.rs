@@ -31,11 +31,11 @@ impl Corner {
         corner
     }
 
-    pub fn is_at(&self, position: CornerPosition) -> bool {
+    pub fn is_at(self, position: CornerPosition) -> bool {
         self.pos.sorted() == position.sorted()
     }
 
-    pub fn id_on(&self, pos_face: Face) -> Face {
+    pub fn id_on(self, pos_face: Face) -> Face {
         let Self { id, pos } = self;
         match pos_face {
             f if f == pos.0 => id.0,
@@ -46,12 +46,12 @@ impl Corner {
     }
 
     #[cfg(test)]
-    pub fn as_ruby(&self) -> [[Face; 3]; 2] {
+    pub fn as_ruby(self) -> [[Face; 3]; 2] {
         let Self { id, pos } = self;
         [[id.0, id.1, id.2], [pos.0, pos.1, pos.2]]
     }
 
-    pub fn position_without<F: Into<Face>>(&self, face: F) -> (Face, Face) {
+    pub fn position_without<F: Into<Face>>(self, face: F) -> (Face, Face) {
         self.pos.without(face.into())
     }
 }

@@ -7,7 +7,6 @@ use crate::cube::algorithm::Algorithm;
 use crate::algorithm_data::*;
 use crate::cube::piece::face::Face;
 use crate::cube::transpose::Transposed;
-use crate::cube::piece::Piece;
 
 // NOTE: ..._default methods work on a default cube (down, front = 0, 5)
 impl Cube {
@@ -18,7 +17,7 @@ impl Cube {
         let mut algs = vec![];
 
         for order in adjacent.iter().permutations(adjacent.len()) {
-            let mut tester = self.clone();
+            let mut tester = *self;
             let mut order_alg = Algorithm::new();
 
             for &front in order {
@@ -30,16 +29,16 @@ impl Cube {
 
                 let position = edges.iter()
                     .find(|e| e.has_id(default))
-                    .expect(&format!("didn't find piece with id '{:?}'", default))
+                    .unwrap_or_else(|| panic!("didn't find piece with id '{:?}'", default))
                     .pos;
 
                 let alg = cross_data()[&position]
                     .eval_by(|pos|
-                        pos.iter().find(|&&p|
-                            edges.iter().find(|e|
+                        pos.iter().any(|&p|
+                            edges.iter().any(|e|
                                 e.is_at(p) && e.is_solved()
-                            ).is_some()
-                        ).is_some()
+                            )
+                        )
                     )
                     .transposed(cpos!(0, 5), cpos!(down, front));
 

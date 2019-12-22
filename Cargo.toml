@@ -1,5 +1,5 @@
 [package]
-name = "Rustiks"
+name = "rustiks"
 version = "0.1.0"
 authors = ["gorilskij <43991400@users.noreply.github.com>"]
 edition = "2018"

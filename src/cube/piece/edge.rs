@@ -4,8 +4,8 @@ use crate::cube::resort::Resort;
 use super::position::EdgePosition;
 use crate::cube::transpose::{Transpose, Projection};
 use std::fmt::{Display, Formatter, Error, Debug};
-use crate::cube::piece::position::Position;
-use std::hash::Hash;
+
+
 
 #[macro_export]
 macro_rules! edge {
@@ -33,23 +33,23 @@ impl Edge {
         edge
     }
 
-    pub fn is_solved(&self) -> bool {
+    pub fn is_solved(self) -> bool {
         self.id == self.pos
     }
 
-    pub fn is_at(&self, position: EdgePosition) -> bool {
+    pub fn is_at(self, position: EdgePosition) -> bool {
         self.pos.sorted() == position.sorted()
     }
 
-    pub fn has_id(&self, id: EdgePosition) -> bool {
+    pub fn has_id(self, id: EdgePosition) -> bool {
         self.id.sorted() == id.sorted()
     }
 
-    pub fn id_contains(&self, face: Face) -> bool {
+    pub fn id_contains(self, face: Face) -> bool {
         self.id.0 == face || self.id.1 == face
     }
 
-    pub fn id_on(&self, pos_face: Face) -> Face {
+    pub fn id_on(self, pos_face: Face) -> Face {
         match pos_face {
             f if f == self.pos.0 => self.id.0,
             f if f == self.pos.1 => self.id.1,
@@ -58,13 +58,13 @@ impl Edge {
     }
 
     #[cfg(test)]
-    pub fn as_ruby(&self) -> [[Face; 2]; 2] {
+    pub fn as_ruby(self) -> [[Face; 2]; 2] {
         let id = self.id;
         let pos = self.pos;
         [[id.0, id.1], [pos.0, pos.1]]
     }
 
-    pub fn position_without<F: Into<Face>>(&self, face: F) -> Face {
+    pub fn position_without<F: Into<Face>>(self, face: F) -> Face {
         self.pos.without(face.into())
     }
 }

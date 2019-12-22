@@ -13,13 +13,13 @@ impl<F: Into<Face>> From<(F, F, F)> for CornerPosition {
 }
 
 impl CornerPosition {
-    pub fn sorted(&self) -> Self {
+    pub fn sorted(self) -> Self {
         let mut vec = vec![self.0, self.1, self.2];
         vec.sort();
         Self(vec[0], vec[1], vec[2])
     }
 
-    pub fn without(&self, face: Face) -> (Face, Face) {
+    pub fn without(self, face: Face) -> (Face, Face) {
         match face {
             f if f == self.0 => (self.1, self.2),
             f if f == self.1 => (self.0, self.2),

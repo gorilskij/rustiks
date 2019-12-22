@@ -1,4 +1,5 @@
 //Moves = 'UDFBRL'.split('').flat_map {|i| [i, i + '2', i + "'"]}
+#![allow(dead_code)]
 extern crate serde;
 extern crate serde_json;
 
@@ -108,7 +109,7 @@ fn load2<P: AsRef<Path>>(path: P) -> HashMap<Vec<usize>, Algorithm> {
     for line in iter_lines(path) {
         let (pred, alg) = split_at_first(&line, ':');
         let pred = pred.split(',')
-            .map(|i| i.parse().expect(&format!("Invalid value for usize: {}" , i)))
+            .map(|i| i.parse().unwrap_or_else(|_| panic!("Invalid value for usize: {}" , i)))
             .collect();
         let alg = Algorithm::from(&alg[1..alg.len() - 1]);
         safe_insert(&mut map, pred, alg);

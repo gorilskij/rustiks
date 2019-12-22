@@ -2,8 +2,6 @@ use itertools::Itertools;
 use std::fmt::{Display, Formatter, Error, Debug};
 use std::iter::FromIterator;
 use super::piece::face::Face;
-use serde::{Deserialize, Serialize, Serializer, Deserializer};
-use serde::de::{self, Visitor};
 use crate::cube::transpose::Transpose;
 
 #[macro_export]
@@ -33,7 +31,7 @@ impl From<char> for MoveType {
 }
 
 impl MoveType {
-    fn base_move(&self) -> Self {
+    fn base_move(self) -> Self {
         match self {
             MoveType::L | MoveType::R => MoveType::L,
             MoveType::U | MoveType::D => MoveType::D,
@@ -41,7 +39,7 @@ impl MoveType {
         }
     }
 
-    fn opposite(&self) -> Self {
+    fn opposite(self) -> Self {
         match self {
             MoveType::L => MoveType::R,
             MoveType::R => MoveType::L,
@@ -76,7 +74,7 @@ impl From<&str> for Move {
 }
 
 impl Move {
-    fn reversed(&self) -> Self {
+    fn reversed(self) -> Self {
         Self(self.0, match self.1 {
             1 => 3,
             2 => 2,
@@ -85,12 +83,12 @@ impl Move {
         })
     }
 
-    fn base_move(&self) -> MoveType {
+    fn base_move(self) -> MoveType {
         self.0.base_move()
     }
 
     // TODO: maybe implement some cube state where 'R' isn't always the same face
-    pub fn face(&self) -> Face {
+    pub fn face(self) -> Face {
         match self.0 {
             MoveType::U => 0,
             MoveType::L => 1,
@@ -101,7 +99,7 @@ impl Move {
         }.into()
     }
 
-    pub fn times(&self) -> u8 {
+    pub fn times(self) -> u8 {
         self.1
     }
 }
@@ -128,7 +126,7 @@ pub struct Algorithm(Vec<Move>);
 
 impl<S: AsRef<str>> From<S> for Algorithm {
     fn from(s: S) -> Self {
-        Self(s.as_ref().split_whitespace().map(|s| Move::from(s)).collect())
+        Self(s.as_ref().split_whitespace().map(Move::from).collect())
     }
 }
 
@@ -152,9 +150,16 @@ impl FromIterator<Move> for Algorithm {
 }
 
 #[allow(dead_code)]
+impl Default for Algorithm {
+    fn default() -> Self {
+        Self(Vec::new())
+    }
+}
+
+#[allow(dead_code)]
 impl Algorithm {
     pub fn new() -> Self {
-        Self(Vec::new())
+        Self::default()
     }
 
     pub fn len(&self) -> usize {
@@ -168,6 +173,7 @@ impl Algorithm {
     pub fn reversed(&self) -> Self {
         let reversed_iter = self.0
             .iter()
+            .copied()
             .rev()
             .map(Move::reversed);
         Self(reversed_iter.collect())
@@ -248,35 +254,6 @@ impl<'a> IntoIterator for &'a Algorithm {
 impl Debug for Algorithm {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(f, "{}", self.0.iter().join(" "))
-    }
-}
-
-impl Serialize for Algorithm {
-    fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
-        where S: Serializer {
-        return serializer.serialize_str(&format!("{:?}", self))
-    }
-}
-
-struct StrVisitor;
-
-impl<'de> Visitor<'de> for StrVisitor {
-    type Value = String;
-
-    fn expecting(&self, formatter: &mut Formatter) -> Result<(), Error> {
-        write!(formatter, "a valid algorithm")
-    }
-
-    fn visit_str<E>(self, value: &str) -> Result<Self::Value, E> where E: de::Error {
-        Ok(value.to_string())
-    }
-}
-
-impl<'de> Deserialize<'de> for Algorithm {
-    fn deserialize<D>(deserializer: D) -> Result<Self, <D as Deserializer<'de>>::Error> where
-        D: Deserializer<'de> {
-        deserializer.deserialize_str(StrVisitor).map(|s|
-            Algorithm::from(s.as_str()))
     }
 }
 

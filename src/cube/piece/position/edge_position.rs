@@ -15,15 +15,15 @@ impl<F: Into<Face>> From<(F, F)> for EdgePosition {
 }
 
 impl EdgePosition {
-    pub fn sorted(&self) -> Self {
+    pub fn sorted(self) -> Self {
         if self.0 > self.1 {
             Self(self.1, self.0)
         } else {
-            *self
+            self
         }
     }
 
-    pub fn without(&self, face: Face) -> Face {
+    pub fn without(self, face: Face) -> Face {
         match face {
             f if f == self.0 => self.1,
             f if f == self.1 => self.0,

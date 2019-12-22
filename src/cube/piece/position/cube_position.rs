@@ -11,7 +11,7 @@ pub struct CubePosition {
 // TODO: re-privatize fields and check validity on creation
 // TODO: also for EdgePosition and CornerPosition
 impl CubePosition {
-    pub fn projection(&self) -> [Face; 6] {
+    pub fn projection(self) -> [Face; 6] {
         let mut mid = self.front.adjacent_clockwise();
 
         let len = mid.len();

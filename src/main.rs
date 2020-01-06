@@ -50,7 +50,6 @@ fn main() {
     cube.apply(&solution);
     println!("{}", cube.colored());
 
-//    let ca: CrossAlg = serde_json::from_str(&s).expect("failed to deserialize");
 
 //    let mut cube = Cube::solved();
 //    cube.apply(&alg!("U R R' U'"));

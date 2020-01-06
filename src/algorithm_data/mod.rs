@@ -1,8 +1,5 @@
 //Moves = 'UDFBRL'.split('').flat_map {|i| [i, i + '2', i + "'"]}
 #![allow(dead_code)]
-extern crate serde;
-extern crate serde_json;
-
 use std::collections::HashMap;
 use crate::support::Tern;
 use crate::cube::piece::position::{EdgePosition, CornerPosition};

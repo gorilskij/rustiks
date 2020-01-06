@@ -1,11 +1,10 @@
 use crate::cube::piece::face::Face;
 use crate::cube::transpose::{Transpose, Projection};
 use std::fmt::{Debug, Display, Formatter, Error};
-use serde::Deserialize;
 use std::iter::FromIterator;
 use std::cmp::Ordering;
 
-#[derive(Copy, Clone, Eq, PartialEq, Deserialize, Hash)]
+#[derive(Copy, Clone, Eq, PartialEq, Hash)]
 pub struct EdgePosition(pub Face, pub Face);
 
 impl<F: Into<Face>> From<(F, F)> for EdgePosition {

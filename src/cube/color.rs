@@ -21,9 +21,9 @@ fn to_color(f: u8) -> ColoredString {
 #[derive(Copy, Clone)]
 pub struct ColoredCube<'a>(&'a Cube);
 
-fn color_cube(uncolored: String) -> String {
+fn color_cube<S: AsRef<str>>(uncolored: S) -> String {
     // TODO: fix ugly replaces
-    uncolored
+    uncolored.as_ref()
         .replace("\n\n", "nn")
         .replace("\n", "\n\n")
         .replace("nn", "\n\n\n")

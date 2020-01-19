@@ -18,13 +18,14 @@ enum MoveType {
 
 impl From<char> for MoveType {
     fn from(c: char) -> Self {
+        use MoveType::*;
         match c {
-            'L' => MoveType::L,
-            'R' => MoveType::R,
-            'U' => MoveType::U,
-            'D' => MoveType::D,
-            'F' => MoveType::F,
-            'B' => MoveType::B,
+            'L' => L,
+            'R' => R,
+            'U' => U,
+            'D' => D,
+            'F' => F,
+            'B' => B,
             _ => panic!("invalid move type '{}'", c),
         }
     }
@@ -32,21 +33,20 @@ impl From<char> for MoveType {
 
 impl MoveType {
     fn base_move(self) -> Self {
+        use MoveType::*;
         match self {
-            MoveType::L | MoveType::R => MoveType::L,
-            MoveType::U | MoveType::D => MoveType::D,
-            MoveType::F | MoveType::B => MoveType::B,
+            L | R => L,
+            U | D => D,
+            F | B => B,
         }
     }
 
     fn opposite(self) -> Self {
+        use MoveType::*;
         match self {
-            MoveType::L => MoveType::R,
-            MoveType::R => MoveType::L,
-            MoveType::U => MoveType::D,
-            MoveType::D => MoveType::U,
-            MoveType::F => MoveType::B,
-            MoveType::B => MoveType::F,
+            L => R, R => L,
+            U => D, D => U,
+            F => B, B => F,
         }
     }
 }
@@ -166,7 +166,7 @@ impl Algorithm {
         self.0.len()
     }
 
-    pub fn push(&mut self, mut alg: Algorithm) {
+    pub fn push(&mut self, mut alg: Self) {
         self.0.append(&mut alg.0)
     }
 
@@ -246,6 +246,7 @@ impl<'a> IntoIterator for &'a Algorithm {
     type Item = &'a Move;
     type IntoIter = <&'a Vec<Move> as IntoIterator>::IntoIter;
 
+    #[must_use]
     fn into_iter(self) -> Self::IntoIter {
         self.0.iter()
     }

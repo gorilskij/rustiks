@@ -1,21 +1,25 @@
 #![allow(unused_macros)]
+#![allow(unused_imports)]
 
-#[allow(unused_imports)] use cube::transpose::{Transpose, Transposed};
-#[allow(unused_imports)] use cube::Cube;
-#[allow(unused_imports)] use cube::algorithm::Algorithm;
-#[allow(unused_imports)] use std::process::exit;
-#[allow(unused_imports)] use crate::cube::piece::face::Face;
-#[allow(unused_imports)] use crate::cube::piece::Piece;
+//#![deny(clippy::pedantic)]
+#![warn(clippy::style)]
 
-#[allow(unused_imports)] use std::fs::File;
-#[allow(unused_imports)] use std::io::Read;
-#[allow(unused_imports)] //use algorithm_data::{load_cross, load_f2l, load2};
-#[allow(unused_imports)] use std::hash::Hash;
-#[allow(unused_imports)] use itertools::Itertools;
-#[allow(unused_imports)] use std::collections::HashMap;
-#[allow(unused_imports)] use crate::cube::piece::position::EdgePosition;
-#[allow(unused_imports)] use crate::support::Tern;
-#[allow(unused_imports)] use crate::algorithm_data::{cross_data, f2l_data, oll_data, pll_data};
+use cube::transpose::{Transpose, Transposed};
+use cube::Cube;
+use cube::algorithm::Algorithm;
+use std::process::exit;
+use crate::cube::piece::face::Face;
+use crate::cube::piece::Piece;
+
+use std::fs::File;
+use std::io::Read;
+//use algorithm_data::{load_cross, load_f2l, load2};
+use std::hash::Hash;
+use itertools::Itertools;
+use std::collections::HashMap;
+use crate::cube::piece::position::EdgePosition;
+use crate::support::Tern;
+use crate::algorithm_data::{cross_data, f2l_data, oll_data, pll_data};
 
 extern crate md5;
 

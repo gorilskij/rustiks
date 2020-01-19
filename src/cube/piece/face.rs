@@ -75,13 +75,13 @@ impl Face {
         self + 3
     }
 
-    pub fn adjacent(self) -> [Face; 4] {
+    pub fn adjacent(self) -> [Self; 4] {
         let mut adjacent = [self - 2, self - 1, self + 1, self + 2];
         adjacent.sort();
         adjacent
     }
 
-    pub fn adjacent_clockwise(self) -> [Face; 4] {
+    pub fn adjacent_clockwise(self) -> [Self; 4] {
         let mut adjacent = self.adjacent();
         if self.is_even() { adjacent.reverse() }
         adjacent

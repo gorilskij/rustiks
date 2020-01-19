@@ -7,6 +7,7 @@ use crate::cube::algorithm::Algorithm;
 use crate::algorithm_data::*;
 use crate::cube::piece::face::Face;
 use crate::cube::transpose::Transposed;
+use boolinator::Boolinator;
 
 // NOTE: ..._default methods work on a default cube (down, front = 0, 5)
 impl Cube {
@@ -22,9 +23,8 @@ impl Cube {
 
             for &front in order {
                 let edges = tester.iter_edges()
-                    .filter(|edge| edge.id_contains(down))
-                    .map(|e|
-                        e.transposed(cpos!(down, front), cpos!(0, 5)))
+                    .filter_map(|edge| edge.id_contains(down)
+                        .as_some(edge.transposed(cpos!(down, front), cpos!(0, 5))))
                     .collect::<Vec<_>>();
 
                 let position = edges.iter()
@@ -56,9 +56,8 @@ impl Cube {
 
     #[allow(dead_code)]
     pub fn solution(&self) -> Algorithm {
-        let cross_alg = self.cross_solution_default(Face::new(0));
-
-//        unimplemented!()
-        cross_alg
+        todo!()
+//        let cross_alg = self.cross_solution_default(Face::new(0));
+//        cross_alg
     }
 }

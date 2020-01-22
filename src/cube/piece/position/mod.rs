@@ -34,8 +34,8 @@ pub struct Position<const N: usize>(pub [Face; N]);
 
 // this is bad, TODO: derive these traits when const generics are fully implemented
 impl<const N: usize> PartialEq for Position<N> {
-    fn eq(self, rhs: Position<N>) -> bool {
-        &self.0 == &rhs.0
+    fn eq(&self, other: &Self) -> bool {
+        self.iter().zip(other.iter()).all(|(a, b)| a == b)
     }
 }
 
@@ -81,7 +81,7 @@ impl<const N: usize> Deref for Position<N> {
 
 impl<const N: usize> Position<N> {
     // TODO: remove in favor of deref
-    pub fn iter(&self) -> impl Iterator<Item=Face> {
+    pub fn iter(&self) -> impl Iterator<Item=&Face> {
         self.0.iter()
     }
 
@@ -129,7 +129,10 @@ impl<const N: usize> Transpose for Position<N> {
 impl<const N: usize> Position<N> {
     // fucked up because N - 1 and N - 1 are different types, TODO: clean up
     pub fn without(&self, face: Face) -> Position<{N - 1}> {
-        unsafe { std::mem::transmute( Position(array_collect!(self.iter().filter(|&x| x != face), [Face; {N - 1}])) ) }
+//        unsafe { std::mem::transmute( Position(array_collect!(self.iter().filter(|&&x| x != face).copied(), [Face; {N - 1}])) ) }
+        let mut new = [Face::new(0); {N - 1}];
+        self.iter().filter(|&&x| x != face).copied().enumerate().for_each(|(i, f)| new[i] = f);
+        Position(new)
     }
 }
 

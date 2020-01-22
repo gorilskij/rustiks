@@ -5,7 +5,6 @@ use crate::cube::piece::face::Face;
 use crate::cube::piece::position::Position;
 use crate::cube::resort::Resort;
 use itertools::Itertools;
-use crate::cube::piece::hack::PublicPiece;
 
 #[macro_use] pub mod position;
 //#[macro_use] pub mod edge;
@@ -39,33 +38,32 @@ pub struct Piece<const N: usize> {
     pos: Position<N>,
 }
 
-mod hack {
-    use std::ops::Deref;
-    use super::Piece;
-    use crate::cube::piece::position::Position;
-
-    pub struct PublicPiece<const N: usize> {
-        pub id: Position<N>,
-        pub pos: Position<N>,
-    }
-
-    impl<const N: usize> Deref for Piece<N> {
-        type Target = PublicPiece<N>;
-
-        fn deref(&self) -> &Self::Target {
-            &PublicPiece { id: self.id, pos: self.pos }
-        }
-    }
-}
-
 // TODO: check if resort trait is needed and implement lazy resort (on get, not on set)
 impl<const N: usize> Resort for Piece<N> {
     fn resort(&mut self) {
-        let sorted_pairs = array_collect!(self.id.iter().zip(self.pos.iter()),
-            [(Face, Face); N]);
+//        let sorted_pairs = array_collect!(self.id.iter().copied().zip(self.pos.iter().copied()),
+//            [(Face, Face); N]);
 
-        self.id = array_collect!(sorted_pairs.iter().map(|x| x.0), [Face; N]).into();
-        self.pos = array_collect!(sorted_pairs.iter().map(|x| x.1), [Face; N]).into();
+//        self.id = array_collect!(sorted_pairs.iter().map(|x| x.0), [Face; N]).into();
+//        self.pos = array_collect!(sorted_pairs.iter().map(|x| x.1), [Face; N]).into();
+
+        // this is a bad implementation, TODO: improve when const generics allow
+        let mut pairs = self.id.iter().copied()
+            .zip(self.pos.iter().copied())
+            .collect::<Vec<_>>();
+
+        pairs.sort();
+
+        let mut ida = [Face::new(0); N];
+        let mut posa = [Face::new(0); N];
+
+        for (i, (iv, pv)) in pairs.into_iter().enumerate() {
+            ida[i] = iv;
+            posa[i] = pv;
+        }
+
+        self.id = Position(ida);
+        self.pos = Position(posa);
     }
 }
 
@@ -88,21 +86,21 @@ impl<const N: usize> Piece<N> {
         piece
     }
 
-    pub fn modify(&mut self, f: impl FnOnce(&mut PublicPiece<N>)) {
-        let mut pp = PublicPiece { id: self.id, pos: self.pos };
-        f(&mut pp);
-        let mut new = Self { id: pp.id, pos: pp.pos };
-        new.resort();
-        *self = new;
+    pub fn id(&self) -> &Position<N> { &self.id }
+
+    pub fn pos(&self) -> &Position<N> { &self.pos }
+
+    pub fn transpose_pos(&mut self, from: Position<2>, to: Position<2>) {
+        self.pos.transpose(from, to)
     }
 
     pub fn is_on(&self, face: Face) -> bool {
-        self.pos.iter().any(|f| f == face)
+        self.pos.iter().any(|&f| f == face)
     }
 
     pub fn id_on(&self, face: Face) -> Face {
         let idx = self.pos.iter()
-            .position(|f| f == face)
+            .position(|&f| f == face)
             .expect("not on that face");
 
         self.id[idx]

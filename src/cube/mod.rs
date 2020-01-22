@@ -119,21 +119,21 @@ impl Cube {
     }
 
     pub fn edge_at(&self, position: Position<2>) -> &Edge {
-        match self.edges.iter().find(|e| e.pos == position) {
+        match self.edges.iter().find(|e| e.pos() == &position) {
             Some(e) => e,
             None => unreachable!("no edge at {:?}", position)
         }
     }
 
     pub fn corner_at(&self, position: Position<3>) -> &Corner {
-        match self.corners.iter().find(|c| c.pos == position) {
+        match self.corners.iter().find(|c| c.pos() == &position) {
             Some(c) => c,
             None => unreachable!("no corner at {:?}", position)
         }
     }
 
     pub fn corner_at_mut(&mut self, position: Position<3>) -> &mut Corner {
-        match self.corners.iter_mut().find(|c| c.pos == position) {
+        match self.corners.iter_mut().find(|c| c.pos() == &position) {
             Some(c) => c,
             None => unreachable!("no corner at {:?}", position)
         }
@@ -161,27 +161,25 @@ impl Cube {
             .iter_mut()
             .filter(|e| e.is_on(face))
             .for_each(|edge| {
-                let missing = edge.pos.without(face)[0];
+                let missing = edge.pos().without(face)[0];
                 let index: usize = clockwise.iter().position(
                     |x| *x == missing).unwrap();
                 let next = clockwise[(index + times as usize) % clockwise.len()];
 //                edge.transpose_pos(pos!(face, missing), pos!(face, next));
-                edge.modify(|this|
-                    this.pos.transpose(pos!(face, missing), pos!(face, next)))
+                edge.transpose_pos(pos!(face, missing), pos!(face, next))
             });
 
         self.corners
             .iter_mut()
             .filter(|c| c.is_on(face))
             .for_each(|corner| {
-                let missing = corner.pos.without(face)[0];
+                let missing = corner.pos().without(face)[0];
                 let index: usize = clockwise.iter().position(
                     |x| *x == missing
                 ).unwrap();
                 let next = clockwise[(index + times as usize) % clockwise.len()];
 //                corner.transpose_pos(pos!(face, missing), pos!(face, next));
-                corner.modify(|this|
-                    this.pos.transpose(pos!(face, missing), pos!(face, next)));
+                corner.transpose_pos(pos!(face, missing), pos!(face, next))
             });
     }
 

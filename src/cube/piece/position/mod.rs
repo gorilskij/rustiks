@@ -23,12 +23,46 @@ macro_rules! pos {
 }
 
 use super::Face;
-use std::ops::Deref;
-use crate::cube::transpose::Projection;
+use std::ops::{Deref, Index};
+use crate::cube::transpose::{Projection, Transpose};
 use std::iter::once;
+use std::fmt::{Debug, Formatter, Error};
 
-#[derive(Copy, Clone, Eq, PartialEq)]
+#[derive(Copy, Clone)]
 pub struct Position<const N: usize>(pub [Face; N]);
+
+
+// this is bad, TODO: derive these traits when const generics are fully implemented
+impl<const N: usize> PartialEq for Position<N> {
+    fn eq(self, rhs: Position<N>) -> bool {
+        &self.0 == &rhs.0
+    }
+}
+
+impl<const N: usize> Eq for Position<N> {}
+
+impl<const N: usize> Debug for Position<N> {
+    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
+        write!(f, "[")?;
+        for x in self.iter() {
+            write!(f, "{}, ", x)?
+        }
+        writeln!(f, "]")
+    }
+}
+// end of bad shit
+
+
+
+
+
+
+
+
+
+
+
+
 
 impl<T: Into<Face>, const N: usize> From<[T; N]> for Position<N> {
     fn from(array: [T; N]) -> Self {
@@ -38,10 +72,26 @@ impl<T: Into<Face>, const N: usize> From<[T; N]> for Position<N> {
 }
 
 impl<const N: usize> Deref for Position<N> {
-    type Target = [T; N];
+    type Target = [Face];
 
     fn deref(&self) -> &Self::Target {
         &self.0
+    }
+}
+
+impl<const N: usize> Position<N> {
+    // TODO: remove in favor of deref
+    pub fn iter(&self) -> impl Iterator<Item=Face> {
+        self.0.iter()
+    }
+
+    pub fn sorted(mut self) -> Self {
+        self.0.sort();
+        self
+    }
+
+    pub fn has(self, face: Face) -> bool {
+        self.0.contains(&face)
     }
 }
 
@@ -66,4 +116,27 @@ pub fn projection(position: Position<2>) -> Projection {
         .copied();
 
     array_collect!(iterator, [Face; 6])
+}
+
+impl<const N: usize> Transpose for Position<N> {
+    fn transpose_with_projection(&mut self, from: Projection, to: Projection) {
+        for x in &mut self.0 as &mut[Face] {
+            x.transpose_with_projection(from, to)
+        }
+    }
+}
+
+impl<const N: usize> Position<N> {
+    // fucked up because N - 1 and N - 1 are different types, TODO: clean up
+    pub fn without(&self, face: Face) -> Position<{N - 1}> {
+        unsafe { std::mem::transmute( Position(array_collect!(self.iter().filter(|&x| x != face), [Face; {N - 1}])) ) }
+    }
+}
+
+impl<const N: usize> Index<usize> for Position<N> {
+    type Output = Face;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.0[index]
+    }
 }

@@ -23,6 +23,8 @@
 //use crate::support::Tern;
 //use crate::algorithm_data::{cross_data, f2l_data, oll_data, pll_data};
 
+use crate::cube::Cube;
+
 #[macro_use]
 mod support;
 

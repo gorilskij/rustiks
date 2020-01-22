@@ -119,21 +119,21 @@ impl Cube {
     }
 
     pub fn edge_at(&self, position: Position<2>) -> &Edge {
-        match self.edges.iter().find(|e| e.is_at(position)) {
+        match self.edges.iter().find(|e| e.pos == position) {
             Some(e) => e,
             None => unreachable!("no edge at {:?}", position)
         }
     }
 
     pub fn corner_at(&self, position: Position<3>) -> &Corner {
-        match self.corners.iter().find(|c| c.is_at(position)) {
+        match self.corners.iter().find(|c| c.pos == position) {
             Some(c) => c,
             None => unreachable!("no corner at {:?}", position)
         }
     }
 
     pub fn corner_at_mut(&mut self, position: Position<3>) -> &mut Corner {
-        match self.corners.iter_mut().find(|c| c.is_at(position)) {
+        match self.corners.iter_mut().find(|c| c.pos == position) {
             Some(c) => c,
             None => unreachable!("no corner at {:?}", position)
         }
@@ -161,23 +161,27 @@ impl Cube {
             .iter_mut()
             .filter(|e| e.is_on(face))
             .for_each(|edge| {
-                let missing = edge.position_without(face);
+                let missing = edge.pos.without(face)[0];
                 let index: usize = clockwise.iter().position(
                     |x| *x == missing).unwrap();
                 let next = clockwise[(index + times as usize) % clockwise.len()];
-                edge.transpose_pos(pos!(face, missing), pos!(face, next));
+//                edge.transpose_pos(pos!(face, missing), pos!(face, next));
+                edge.modify(|this|
+                    this.pos.transpose(pos!(face, missing), pos!(face, next)))
             });
 
         self.corners
             .iter_mut()
             .filter(|c| c.is_on(face))
             .for_each(|corner| {
-                let missing = corner.position_without(face).0;
+                let missing = corner.pos.without(face)[0];
                 let index: usize = clockwise.iter().position(
                     |x| *x == missing
                 ).unwrap();
                 let next = clockwise[(index + times as usize) % clockwise.len()];
-                corner.transpose_pos(pos!(face, missing), pos!(face, next));
+//                corner.transpose_pos(pos!(face, missing), pos!(face, next));
+                corner.modify(|this|
+                    this.pos.transpose(pos!(face, missing), pos!(face, next)));
             });
     }
 
@@ -194,23 +198,23 @@ impl Cube {
 impl Cube {
     pub fn iter_edges(&self) -> impl Iterator<Item=&Edge> { self.edges.iter() }
     pub fn iter_corners(&self) -> impl Iterator<Item=&Corner> { self.corners.iter() }
-    pub fn iter_pieces(&self) -> impl Iterator<Item=&Piece> {
-        self.iter_edges()
-            .map(|e| e as &Piece)
-            .chain(
-                self.iter_corners()
-                    .map(|c| c as &Piece)
-            )
-    }
+//    pub fn iter_pieces(&self) -> impl Iterator<Item=&Piece> {
+//        self.iter_edges()
+//            .map(|e| e as &Piece)
+//            .chain(
+//                self.iter_corners()
+//                    .map(|c| c as &Piece)
+//            )
+//    }
     pub fn iter_edges_mut(&mut self) -> impl Iterator<Item=&mut Edge> { self.edges.iter_mut() }
     pub fn iter_corners_mut(&mut self) -> impl Iterator<Item=&mut Corner> {
         self.corners.iter_mut()
     }
 
-    pub fn iter_pieces_on<F: Into<Face>>(&self, face: F) -> impl Iterator<Item=&Piece> {
-        let face = face.into();
-        self.iter_pieces().filter(move |p| p.is_on(face))
-    }
+//    pub fn iter_pieces_on<F: Into<Face>>(&self, face: F) -> impl Iterator<Item=&Piece> {
+//        let face = face.into();
+//        self.iter_pieces().filter(move |p: &&Piece| p.is_on(face))
+//    }
 }
 
 impl Transpose for Cube {

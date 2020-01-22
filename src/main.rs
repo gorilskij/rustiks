@@ -1,27 +1,27 @@
+#![feature(const_generics)]
+
 #![allow(unused_macros)]
 #![allow(unused_imports)]
 
-//#![deny(clippy::pedantic)]
+#![warn(clippy::pedantic)]
 #![warn(clippy::style)]
 
-use cube::transpose::{Transpose, Transposed};
-use cube::Cube;
-use cube::algorithm::Algorithm;
-use std::process::exit;
-use crate::cube::piece::face::Face;
-use crate::cube::piece::Piece;
-
-use std::fs::File;
-use std::io::Read;
-//use algorithm_data::{load_cross, load_f2l, load2};
-use std::hash::Hash;
-use itertools::Itertools;
-use std::collections::HashMap;
-use crate::cube::piece::position::EdgePosition;
-use crate::support::Tern;
-use crate::algorithm_data::{cross_data, f2l_data, oll_data, pll_data};
-
-extern crate md5;
+//use cube::transpose::{Transpose, Transposed};
+//use cube::Cube;
+//use cube::algorithm::Algorithm;
+//use std::process::exit;
+//use crate::cube::piece::face::Face;
+//use crate::cube::piece::Piece;
+//
+//use std::fs::File;
+//use std::io::Read;
+////use algorithm_data::{load_cross, load_f2l, load2};
+//use std::hash::Hash;
+//use itertools::Itertools;
+//use std::collections::HashMap;
+////use crate::cube::piece::position::EdgePosition;
+//use crate::support::Tern;
+//use crate::algorithm_data::{cross_data, f2l_data, oll_data, pll_data};
 
 #[macro_use]
 mod support;
@@ -46,13 +46,18 @@ fn main() {
 //    oll_data();
 //    pll_data();
 
+
+
+
     let mut cube = Cube::solved();
-    cube.apply(&alg!("L R B U"));
-    println!("{}", cube.colored());
-    let solution = cube.solution();
-    println!("solution: {:?}", solution);
-    cube.apply(&solution);
-    println!("{}", cube.colored());
+//    cube.apply(&alg!("L R B U"));
+//    println!("{}", cube.colored());
+//    let solution = cube.solution();
+//    println!("solution: {:?}", solution);
+//    cube.apply(&solution);
+//    println!("{}", cube.colored());
+
+
 
 
 //    let mut cube = Cube::solved();

@@ -1,7 +1,7 @@
 use crate::cube::transpose::{Transpose, Projection};
 use std::fmt::{Display, Formatter, Error, Debug};
 use std::ops::{Add, Sub};
-use crate::cube::piece::{edge::Edge, corner::Corner};
+use crate::cube::piece::{Edge, Corner};
 
 // TODO: consider converting to an enum
 // TODO: or writing a strong tie between front, back, ... and 0, 1, ...

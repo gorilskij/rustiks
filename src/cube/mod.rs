@@ -1,15 +1,14 @@
-pub use piece::{edge::Edge, corner::Corner};
+pub use piece::{Edge, Corner};
 
 use piece::face::Face;
 
 use std::fmt::{Debug, Formatter, Error, Display};
 use crate::cube::transpose::{Transpose, Projection};
-use piece::position::{EdgePosition, CornerPosition};
 use itertools::Itertools;
 use crate::cube::algorithm::{Algorithm, Move};
 use crate::cube::piece::Piece;
-use crate::cube::piece::position::CubePosition;
 use std::iter::once;
+use crate::cube::piece::position::Position;
 
 #[macro_use]
 pub mod piece;
@@ -22,7 +21,7 @@ pub mod algorithm;
 
 mod manipulation;
 mod color;
-mod solving;
+//mod solving; // TODO: refactor
 
 #[derive(Eq, PartialEq, Copy, Clone)]
 pub struct Cube {
@@ -119,29 +118,29 @@ impl Cube {
         *self == Self::solved()
     }
 
-    pub fn edge_at(&self, position: EdgePosition) -> &Edge {
+    pub fn edge_at(&self, position: Position<2>) -> &Edge {
         match self.edges.iter().find(|e| e.is_at(position)) {
             Some(e) => e,
             None => unreachable!("no edge at {:?}", position)
         }
     }
 
-    pub fn corner_at(&self, position: CornerPosition) -> &Corner {
+    pub fn corner_at(&self, position: Position<3>) -> &Corner {
         match self.corners.iter().find(|c| c.is_at(position)) {
             Some(c) => c,
             None => unreachable!("no corner at {:?}", position)
         }
     }
 
-    pub fn corner_at_mut(&mut self, position: CornerPosition) -> &mut Corner {
+    pub fn corner_at_mut(&mut self, position: Position<3>) -> &mut Corner {
         match self.corners.iter_mut().find(|c| c.is_at(position)) {
             Some(c) => c,
             None => unreachable!("no corner at {:?}", position)
         }
     }
 
-    fn get_face_matrix(&self, position: CubePosition) -> FaceMatrix {
-        let CubePosition { front: f, down: d } = position;
+    fn get_face_matrix(&self, position: Position<2>) -> FaceMatrix {
+        let Position([f, d]) = position;
 
         let mut adjacent_clockwise = f.adjacent_clockwise();
         let mid = adjacent_clockwise
@@ -166,7 +165,7 @@ impl Cube {
                 let index: usize = clockwise.iter().position(
                     |x| *x == missing).unwrap();
                 let next = clockwise[(index + times as usize) % clockwise.len()];
-                edge.transpose_pos(cpos!(face, missing), cpos!(face, next));
+                edge.transpose_pos(pos!(face, missing), pos!(face, next));
             });
 
         self.corners
@@ -178,7 +177,7 @@ impl Cube {
                     |x| *x == missing
                 ).unwrap();
                 let next = clockwise[(index + times as usize) % clockwise.len()];
-                corner.transpose_pos(cpos!(face, missing), cpos!(face, next));
+                corner.transpose_pos(pos!(face, missing), pos!(face, next));
             });
     }
 
@@ -195,12 +194,12 @@ impl Cube {
 impl Cube {
     pub fn iter_edges(&self) -> impl Iterator<Item=&Edge> { self.edges.iter() }
     pub fn iter_corners(&self) -> impl Iterator<Item=&Corner> { self.corners.iter() }
-    pub fn iter_pieces(&self) -> impl Iterator<Item=&dyn Piece> {
+    pub fn iter_pieces(&self) -> impl Iterator<Item=&Piece> {
         self.iter_edges()
-            .map(|e| e as &dyn Piece)
+            .map(|e| e as &Piece)
             .chain(
                 self.iter_corners()
-                    .map(|c| c as &dyn Piece)
+                    .map(|c| c as &Piece)
             )
     }
     pub fn iter_edges_mut(&mut self) -> impl Iterator<Item=&mut Edge> { self.edges.iter_mut() }
@@ -208,9 +207,9 @@ impl Cube {
         self.corners.iter_mut()
     }
 
-    pub fn iter_pieces_on<F: Into<Face>>(&self, face: F) -> impl Iterator<Item=&dyn Piece> {
+    pub fn iter_pieces_on<F: Into<Face>>(&self, face: F) -> impl Iterator<Item=&Piece> {
         let face = face.into();
-        self.iter_pieces().filter(move |p: &&dyn Piece| p.is_on(face))
+        self.iter_pieces().filter(move |p| p.is_on(face))
     }
 }
 
@@ -232,7 +231,7 @@ macro_rules! impl_cube_fmt {
             fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
                 macro_rules! format_face {
                     ($face:expr, $below:expr) => {
-                        format!($fmt, self.get_face_matrix(cpos!($face, $below)))
+                        format!($fmt, self.get_face_matrix(pos!($face, $below)))
                     };
                 }
 

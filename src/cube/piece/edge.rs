@@ -1,32 +1,12 @@
 use super::face::Face;
-use crate::cube::piece::Piece;
 use crate::cube::resort::Resort;
-use super::position::EdgePosition;
+//use super::position::EdgePosition;
 use crate::cube::transpose::{Transpose, Projection};
 use std::fmt::{Display, Formatter, Error, Debug};
+use std::ops::Deref;
+use crate::cube::piece::position::Position;
 
-
-
-#[macro_export]
-macro_rules! edge {
-    ($f0:expr, $f1:expr) => {{
-        let id = pos![$f0, $f1];
-        Edge::new(id, id)
-    }};
-    ($id0:expr, $id1:expr, $pos0:expr, $pos1:expr) => {{
-        let id = pos![$id0, $id1];
-        let pos = pos![$pos0, $pos1];
-        Edge::new(id, pos)
-    }}
-}
-
-#[derive(Copy, Clone, Eq, PartialEq)]
-pub struct Edge {
-    id: EdgePosition,
-    pub(crate) pos: EdgePosition,
-}
-
-impl Edge {
+impl<const N: usize> Piece<N> {
     pub fn new(id: EdgePosition, pos: EdgePosition) -> Self {
         let mut edge = Self { id, pos };
         edge.resort();

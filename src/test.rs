@@ -1,4 +1,3 @@
-#[allow(unused_imports)] use crate::cube::piece::position::CubePosition;
 #[allow(unused_imports)] use crate::cube::piece::face::Face;
 #[allow(unused_imports)] use crate::cube::{Edge, Corner};
 #[allow(unused_imports)] use crate::cube::transpose::{Transpose, Transposed};
@@ -37,7 +36,7 @@ fn test_projection() {
     // for (position, projection) test that position.projection() == projection
     macro_rules! assert_eq_projection {
         ([$($id:expr),*], [$($face:expr),*]) => {{
-            let position: CubePosition = cpos![$($id),*];
+            let position: CubePosition = pos![$($id),*];
             let correct_projection: [Face; 6] = to_faces![$($face),*];
 
             assert_eq!(position.projection(), correct_projection)
@@ -79,7 +78,7 @@ fn test_transpose_face() {
         // $face_from_to:(face, [from, from], [to, to])
         ($face_from_to:expr, $expected:expr) => {{
             let (face, from, to) = $face_from_to;
-            let from_pos = cpos!(from[0], from[1]);
+            let from_pos = pos!(from[0], from[1]);
             let to_pos = cpos!(to[0], to[1]);
             let transposed = Face::from(face).transposed(from_pos, to_pos);
             assert_eq!(transposed, Face::from($expected))

@@ -5,7 +5,7 @@ use std::iter::FromIterator;
 use std::cmp::Ordering;
 
 #[derive(Copy, Clone, Eq, PartialEq, Hash)]
-pub struct EdgePosition(pub Face, pub Face);
+pub struct EdgePosition();
 
 impl<F: Into<Face>> From<(F, F)> for EdgePosition {
     fn from((f0, f1): (F, F)) -> Self {

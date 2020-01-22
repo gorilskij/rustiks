@@ -1,3 +1,5 @@
+// TODO: split up
+
 // TODO: implement this better
 //  consider implementing e.g. an Adjacent type that implements FromIterator
 //  instead of [Face; 4]

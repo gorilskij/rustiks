@@ -24,7 +24,7 @@ impl Cube {
             for &front in order {
                 let edges = tester.iter_edges()
                     .filter_map(|edge| edge.id_contains(down)
-                        .as_some(edge.transposed(cpos!(down, front), cpos!(0, 5))))
+                        .as_some(edge.transposed(pos!(down, front), pos!(0, 5))))
                     .collect::<Vec<_>>();
 
                 let position = edges.iter()
@@ -40,7 +40,7 @@ impl Cube {
                             )
                         )
                     )
-                    .transposed(cpos!(0, 5), cpos!(down, front));
+                    .transposed(pos!(0, 5), pos!(down, front));
 
                 tester.apply(&alg);
                 order_alg.push(alg);

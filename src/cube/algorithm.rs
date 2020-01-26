@@ -6,9 +6,22 @@ use crate::cube::face::Face;
 
 #[macro_export]
 macro_rules! alg {
-    ($str:expr) => {
-        crate::cube::algorithm::Algorithm::from($str)
-    };
+    (R) => { alg!('R') };
+    (L) => { alg!('L') };
+    (U) => { alg!('U') };
+    (D) => { alg!('D') };
+    (F) => { alg!('F') };
+    (B) => { alg!('B') };
+    ($t:tt) => { $crate::cube::algorithm::Alg::from($t) };
+    ($( $t:tt )*) => {{
+        let mut str = String::new();
+        $(
+            str.push_str(stringify!($t));
+            str.push(' ');
+        )*
+        let _ = str.pop();
+        $crate::cube::algorithm::Alg::from(str)
+    }};
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
@@ -122,9 +135,9 @@ impl Debug for Move {
 }
 
 #[derive(Eq, PartialEq, Clone)]
-pub struct Algorithm(Vec<Move>);
+pub struct Alg(Vec<Move>);
 
-impl<S: AsRef<str>> From<S> for Algorithm {
+impl<S: AsRef<str>> From<S> for Alg {
     fn from(s: S) -> Self {
         Self(s.as_ref().split_whitespace().map(Move::from).collect())
     }
@@ -143,21 +156,21 @@ impl<S: AsRef<str>> From<S> for Algorithm {
 //    }
 //}
 
-impl FromIterator<Move> for Algorithm {
+impl FromIterator<Move> for Alg {
     fn from_iter<I: IntoIterator<Item=Move>>(iter: I) -> Self {
         Self(Vec::from_iter(iter))
     }
 }
 
 #[allow(dead_code)]
-impl Default for Algorithm {
+impl Default for Alg {
     fn default() -> Self {
         Self(Vec::new())
     }
 }
 
 #[allow(dead_code)]
-impl Algorithm {
+impl Alg {
     pub fn new() -> Self {
         Self::default()
     }
@@ -233,7 +246,7 @@ impl Algorithm {
     }
 }
 
-impl IntoIterator for Algorithm {
+impl IntoIterator for Alg {
     type Item = Move;
     type IntoIter = <Vec<Move> as IntoIterator>::IntoIter;
 
@@ -242,7 +255,7 @@ impl IntoIterator for Algorithm {
     }
 }
 
-impl<'a> IntoIterator for &'a Algorithm {
+impl<'a> IntoIterator for &'a Alg {
     type Item = &'a Move;
     type IntoIter = <&'a Vec<Move> as IntoIterator>::IntoIter;
 
@@ -252,14 +265,14 @@ impl<'a> IntoIterator for &'a Algorithm {
     }
 }
 
-impl Debug for Algorithm {
+impl Debug for Alg {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(f, "{}", self.0.iter().join(" "))
     }
 }
 
 // WARN: unfinished and probably wrong
-impl Transpose for Algorithm {
+impl Transpose for Alg {
     fn transpose_with_projection(&mut self, from: Projection, to: Projection) {
         const M: [MoveType; 6] = {
             use MoveType::*;

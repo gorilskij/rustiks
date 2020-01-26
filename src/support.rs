@@ -3,6 +3,7 @@
 // TODO: implement this better
 //  consider implementing e.g. an Adjacent type that implements FromIterator
 //  instead of [Face; 4]
+// TODO replace by .collect vec .asslice .tryinto .expect (and encapsulate procedure)
 #[macro_export]
 macro_rules! array_collect {
     ($iter:expr, [$type:ty; $len:expr]) => {{

@@ -2,6 +2,7 @@ use super::transpose::{Transpose, Projection};
 use std::fmt::{Display, Formatter, Error, Debug};
 use std::ops::{Add, Sub};
 use super::piece::Piece;
+use std::convert::TryInto;
 
 // TODO: consider converting to an enum
 // TODO: or writing a strong tie between front, back, ... and 0, 1, ...
@@ -14,11 +15,13 @@ impl From<u8> for Face {
     }
 }
 
+// todo understand who uses this and how and refactor
 impl From<char> for Face {
-    fn from(_c: char) -> Self {
-        todo!("wtf")
-//        Self::new(c.to_digit(10)
-//            .unwrap_or_else(|| panic!("{} is not a valid integer", c)) as u8)
+    fn from(c: char) -> Self {
+//        panic!("")
+//        todo!("wtf")
+        Self::new(c.to_digit(10)
+            .unwrap_or_else(|| panic!("{} is not a valid integer", c)) as u8)
     }
 }
 
@@ -90,18 +93,21 @@ impl Face {
 
     pub fn adjacent_edges(self) -> [Piece<2>; 4] {
         let adjacent = self.adjacent();
-        array_collect!(
-            adjacent.iter().map(|&f| Piece::new_edge(f, self)),
-            [Piece<2>; 4]
-        )
+        adjacent.iter().map(|&f| Piece::new_edge(f, self))
+            .collect::<Vec<_>>()
+            .as_slice()
+            .try_into()
+            .expect("wrong len")
     }
 
     pub fn adjacent_corners(self) -> [Piece<3>; 4] {
         let adjacent = self.adjacent();
-        array_collect!(
-            (0..4).map(|i| Piece::new_corner(self, adjacent[i], adjacent[(i + 1) % 4])),
-            [Piece<3>; 4]
-        )
+        (0..4).map(|i|
+            Piece::new_corner(self, adjacent[i], adjacent[(i + 1) % 4]))
+            .collect::<Vec<_>>()
+            .as_slice()
+            .try_into()
+            .expect("wrong len")
     }
 }
 

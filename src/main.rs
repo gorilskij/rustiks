@@ -4,8 +4,8 @@
 #![allow(unused_macros)]
 #![allow(unused_imports)]
 
-#![warn(clippy::pedantic)]
-#![warn(clippy::style)]
+//#![warn(clippy::pedantic)]
+//#![warn(clippy::style)]
 
 //use cube::transpose::{Transpose, Transposed};
 //use cube::Cube;
@@ -41,6 +41,7 @@ mod algorithm_data;
 //    3
 
 fn main() {
+    better_panic::install();
 //    println!("{}", Cube::solved());
 //    println!("{}", Cube::solved().colored());
 
@@ -57,13 +58,13 @@ fn main() {
 
 
 
-    let mut cube = Cube::solved();
+    let mut cube = Cube::new_solved();
     cube.apply(&alg!("L R B U"));
     println!("{}", cube.colored());
-//    let solution = cube.solution();
-//    println!("solution: {:?}", solution);
-//    cube.apply(&solution);
-//    println!("{}", cube.colored());
+    let solution = cube.solution();
+    println!("solution: {:?}", solution);
+    cube.apply(&solution);
+    println!("{}", cube.colored());
 
 
 

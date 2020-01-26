@@ -52,7 +52,7 @@ fn main() {
 
 
     let mut cube = Cube::solved();
-//    cube.apply(&alg!("L R B U"));
+    cube.apply(&alg!("L R B U"));
 //    println!("{}", cube.colored());
 //    let solution = cube.solution();
 //    println!("solution: {:?}", solution);

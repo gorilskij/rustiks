@@ -16,6 +16,7 @@ impl From<u8> for Face {
 
 impl From<char> for Face {
     fn from(c: char) -> Self {
+        todo!("wtf");
         Self::new(c.to_digit(10)
             .unwrap_or_else(|| panic!("{} is not a valid integer", c)) as u8)
     }

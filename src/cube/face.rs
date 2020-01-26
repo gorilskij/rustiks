@@ -1,7 +1,7 @@
-use crate::cube::transpose::{Transpose, Projection};
+use super::transpose::{Transpose, Projection};
 use std::fmt::{Display, Formatter, Error, Debug};
 use std::ops::{Add, Sub};
-use crate::cube::piece::{Edge, Corner};
+use super::piece::Piece;
 
 // TODO: consider converting to an enum
 // TODO: or writing a strong tie between front, back, ... and 0, 1, ...
@@ -88,19 +88,19 @@ impl Face {
         adjacent
     }
 
-    pub fn adjacent_edges(self) -> [Edge; 4] {
+    pub fn adjacent_edges(self) -> [Piece<2>; 4] {
         let adjacent = self.adjacent();
         array_collect!(
-            adjacent.iter().map(|&f| edge![f, self]),
-            [Edge; 4]
+            adjacent.iter().map(|&f| Piece::new_edge(f, self)),
+            [Piece<2>; 4]
         )
     }
 
-    pub fn adjacent_corners(self) -> [Corner; 4] {
+    pub fn adjacent_corners(self) -> [Piece<3>; 4] {
         let adjacent = self.adjacent();
         array_collect!(
-            (0..4).map(|i| corner![self, adjacent[i], adjacent[(i + 1) % 4]]),
-            [Corner; 4]
+            (0..4).map(|i| Piece::new_corner(self, adjacent[i], adjacent[(i + 1) % 4])),
+            [Piece<3>; 4]
         )
     }
 }

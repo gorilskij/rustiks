@@ -1,8 +1,8 @@
 use itertools::Itertools;
 use std::fmt::{Display, Formatter, Error, Debug};
 use std::iter::FromIterator;
-use super::piece::face::Face;
-use crate::cube::transpose::Transpose;
+use crate::cube::transpose::{Transpose, Projection};
+use crate::cube::face::Face;
 
 #[macro_export]
 macro_rules! alg {
@@ -260,7 +260,7 @@ impl Debug for Algorithm {
 
 // WARN: unfinished and probably wrong
 impl Transpose for Algorithm {
-    fn transpose_with_projection(&mut self, from: [Face; 6], to: [Face; 6]) {
+    fn transpose_with_projection(&mut self, from: Projection, to: Projection) {
         const M: [MoveType; 6] = {
             use MoveType::*;
             [D, L, B, U, R, F] // TODO: understand where this is from

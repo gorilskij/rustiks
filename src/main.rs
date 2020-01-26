@@ -35,6 +35,11 @@ mod test;
 
 mod algorithm_data;
 
+// NOTE: CURRENT CUBE PRINTING REPRESENTATION:
+//    0
+//  5 1 2 4
+//    3
+
 fn main() {
 //    println!("{}", Cube::solved());
 //    println!("{}", Cube::solved().colored());
@@ -53,12 +58,8 @@ fn main() {
 
 
     let mut cube = Cube::solved();
-//    cube.apply(&alg!("L R B U"));
-
-    cube.apply(&alg!("U"));
+    cube.apply(&alg!("L R B U"));
     println!("{}", cube.colored());
-
-
 //    let solution = cube.solution();
 //    println!("solution: {:?}", solution);
 //    cube.apply(&solution);

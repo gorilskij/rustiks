@@ -91,10 +91,10 @@ impl Move {
     pub fn face(self) -> Face {
         match self.0 {
             MoveType::U => 0,
-            MoveType::L => 1,
-            MoveType::F => 5,
-            MoveType::R => 4,
-            MoveType::B => 2,
+            MoveType::L => 5,
+            MoveType::F => 1,
+            MoveType::R => 2,
+            MoveType::B => 4,
             MoveType::D => 3,
         }.into()
     }

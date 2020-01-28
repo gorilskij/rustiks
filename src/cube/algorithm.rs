@@ -6,13 +6,6 @@ use crate::cube::face::Face;
 
 #[macro_export]
 macro_rules! alg {
-    (R) => { alg!('R') };
-    (L) => { alg!('L') };
-    (U) => { alg!('U') };
-    (D) => { alg!('D') };
-    (F) => { alg!('F') };
-    (B) => { alg!('B') };
-    ($t:tt) => { $crate::cube::algorithm::Alg::from($t) };
     ($( $t:tt )*) => {{
         let mut str = String::new();
         $(
@@ -274,6 +267,14 @@ impl Debug for Alg {
 // WARN: unfinished and probably wrong
 impl Transpose for Alg {
     fn transpose_with_projection(&mut self, from: Projection, to: Projection) {
+
+        eprintln!("warning: <Alg as Transpose>::transpose_with_projection skipped");
+        return;
+
+//        todo!("hi, this is probably very wrong,\
+//            both in style and in function, especially \
+//            the letter array, please refer to the main \
+//            file current cube printing representation");
         const M: [MoveType; 6] = {
             use MoveType::*;
             [D, L, B, U, R, F] // TODO: understand where this is from

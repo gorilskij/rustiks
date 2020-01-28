@@ -34,11 +34,19 @@ impl Cube {
                 let alg = cross_data()[&position]
                     .eval_by(|pos|
                         pos.iter().any(|&p|
-                            edges.iter().any(|e|
-                                // todo maybe
-                                //  e.pos().sorted
-                                *e.pos() == p && e.is_solved()
-                            )
+                            edges.iter().any(|e| {
+                                //todo!("choose one of these two, pos: {:?}, p: {:?}, e; {:?}", pos, p, e)
+                                let r1 = *e.pos() == p && e.is_solved();
+                                let r2 = e.pos().sorted() == p && e.is_solved();
+
+                                if r1 == r2 { r1 } else {
+                                    println!("PRE-PANIC CONTEXT");
+                                    println!("pos: {:?}", pos);
+                                    println!("p: {:?}", p);
+                                    println!("e: {:?}", e);
+                                    panic!("{:?}   !=   {:?}", r1, r2);
+                                }
+                            })
                         )
                     )
                     .transposed(pos!(0, 5), pos!(down, front));

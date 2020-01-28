@@ -22,7 +22,6 @@ fn to_color(f: u8) -> ColoredString {
 pub struct ColoredCube<'a>(&'a Cube);
 
 fn color_cube<S: AsRef<str>>(uncolored: S) -> String {
-    // TODO: fix ugly replaces
     uncolored.as_ref()
         .replace("\n\n", "nn")
         .replace("\n", "\n\n")
@@ -34,7 +33,7 @@ fn color_cube<S: AsRef<str>>(uncolored: S) -> String {
             if c.is_numeric() {
                 to_color(c.to_string()
                     .parse()
-                    .unwrap_or_else(|_| panic!("couldn't parse '{}' as u8", c))
+                    .expect(&format!("couldn't parse '{}' as u8", c))
                 )
             } else {
                 c.to_string().normal()
@@ -46,13 +45,6 @@ fn color_cube<S: AsRef<str>>(uncolored: S) -> String {
 impl<'a> Display for ColoredCube<'a> {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
         write!(f, "{}", color_cube(format!("{:?}", self.0)))
-    }
-}
-
-// just for convenience, TODO: remove
-impl<'a> Debug for ColoredCube<'a> {
-    fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        Display::fmt(self, f)
     }
 }
 

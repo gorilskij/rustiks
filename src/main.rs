@@ -59,10 +59,13 @@ fn main() {
 
 
     let mut cube = Cube::new_solved();
-    cube.apply(&alg!("L R B U"));
+
+    cube.apply(&alg!(U));
     println!("{}", cube.colored());
+
     let solution = cube.solution();
-    println!("solution: {:?}", solution);
+    println!("solution: \"{:?}\"", solution);
+
     cube.apply(&solution);
     println!("{}", cube.colored());
 

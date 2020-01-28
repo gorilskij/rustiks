@@ -6,15 +6,9 @@ use crate::cube::face::Face;
 
 #[macro_export]
 macro_rules! alg {
-    ($( $t:tt )*) => {{
-        let mut str = String::new();
-        $(
-            str.push_str(stringify!($t));
-            str.push(' ');
-        )*
-        let _ = str.pop();
-        $crate::cube::algorithm::Alg::from(str)
-    }};
+    ($alg:expr) => {
+        $crate::cube::algorithm::Alg::from($alg)
+    }
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]

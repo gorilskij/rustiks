@@ -1,6 +1,7 @@
 // format: ee
 // default piece: (0 5)
 // select: 0
+// if id 05 is at xx : is one of the edges at eeff solved ? this : that
 01:0204"L2 U' F2""D"
 02:0104"B2 U2 F2""D2"
 04:0102"R2 U F2""D'"

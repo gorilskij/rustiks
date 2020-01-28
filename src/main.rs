@@ -59,8 +59,7 @@ fn main() {
 
 
     let mut cube = Cube::new_solved();
-
-    cube.apply(&alg!(U));
+    cube.apply(&alg!("D R2 F L U F D' F L D F' L2 D' B' D' R B L' U B' L2 B2 L B U"));
     println!("{}", cube.colored());
 
     let solution = cube.solution();

@@ -4,6 +4,7 @@ use crate::cube::resort::Resort;
 use itertools::Itertools;
 use crate::cube::position::Pos;
 use crate::cube::face::Face;
+use std::convert::TryInto;
 
 
 pub type Edge = Piece<2>;
@@ -14,6 +15,9 @@ pub struct Piece<const N: usize> {
     id: Pos<N>,
     pos: Pos<N>,
 }
+
+
+// todo generalize and refactor into from_ruby in test file
 
 // todo derive
 impl<const N: usize> Debug for Piece<N> {

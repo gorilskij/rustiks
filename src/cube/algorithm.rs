@@ -1,19 +1,24 @@
-use itertools::Itertools;
-use std::fmt::{Display, Formatter, Error, Debug};
-use std::iter::FromIterator;
-use crate::cube::transpose::{Transpose, Projection};
 use crate::cube::face::Face;
+use crate::cube::transpose::{Projection, Transpose};
+use itertools::Itertools;
+use std::fmt::{Debug, Display, Error, Formatter};
+use std::iter::FromIterator;
 
 #[macro_export]
 macro_rules! alg {
     ($alg:expr) => {
         $crate::cube::algorithm::Alg::from($alg)
-    }
+    };
 }
 
 #[derive(Copy, Clone, Eq, PartialEq, Debug)]
 enum MoveType {
-    L, R, U, D, F, B
+    L,
+    R,
+    U,
+    D,
+    F,
+    B,
 }
 
 impl From<char> for MoveType {
@@ -44,9 +49,12 @@ impl MoveType {
     fn opposite(self) -> Self {
         use MoveType::*;
         match self {
-            L => R, R => L,
-            U => D, D => U,
-            F => B, B => F,
+            L => R,
+            R => L,
+            U => D,
+            D => U,
+            F => B,
+            B => F,
         }
     }
 }
@@ -59,7 +67,9 @@ impl From<&str> for Move {
         let mut chars = s.chars();
 
         let move_type = MoveType::from(
-            chars.next().unwrap_or_else(|| panic!("move must have a length of at least 1"))
+            chars
+                .next()
+                .unwrap_or_else(|| panic!("move must have a length of at least 1")),
         );
 
         let quantifier = match chars.next() {
@@ -75,12 +85,15 @@ impl From<&str> for Move {
 
 impl Move {
     fn reversed(self) -> Self {
-        Self(self.0, match self.1 {
-            1 => 3,
-            2 => 2,
-            3 => 1,
-            _ => unreachable!()
-        })
+        Self(
+            self.0,
+            match self.1 {
+                1 => 3,
+                2 => 2,
+                3 => 1,
+                _ => unreachable!(),
+            },
+        )
     }
 
     fn base_move(self) -> MoveType {
@@ -96,7 +109,8 @@ impl Move {
             MoveType::R => 2,
             MoveType::B => 4,
             MoveType::D => 3,
-        }.into()
+        }
+        .into()
     }
 
     pub fn times(self) -> u8 {
@@ -106,12 +120,17 @@ impl Move {
 
 impl Display for Move {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "{:?}{}", self.0, match self.1 {
-            1 => "",
-            2 => "2",
-            3 => "'",
-            _ => unreachable!()
-        })
+        write!(
+            f,
+            "{:?}{}",
+            self.0,
+            match self.1 {
+                1 => "",
+                2 => "2",
+                3 => "'",
+                _ => unreachable!(),
+            }
+        )
     }
 }
 
@@ -130,7 +149,6 @@ impl<S: AsRef<str>> From<S> for Alg {
     }
 }
 
-
 //impl From<&str> for Algorithm {
 //    fn from(s: &str) -> Self {
 //        Self(s.split_whitespace().map(|s| Move::from(s)).collect())
@@ -144,7 +162,7 @@ impl<S: AsRef<str>> From<S> for Alg {
 //}
 
 impl FromIterator<Move> for Alg {
-    fn from_iter<I: IntoIterator<Item=Move>>(iter: I) -> Self {
+    fn from_iter<I: IntoIterator<Item = Move>>(iter: I) -> Self {
         Self(Vec::from_iter(iter))
     }
 }
@@ -171,32 +189,28 @@ impl Alg {
     }
 
     pub fn reversed(&self) -> Self {
-        let reversed_iter = self.0
-            .iter()
-            .copied()
-            .rev()
-            .map(Move::reversed);
+        let reversed_iter = self.0.iter().copied().rev().map(Move::reversed);
         Self(reversed_iter.collect())
     }
 
     pub fn simplified(&self) -> Self {
         let mut another_pass = false;
 
-        let processed = self.to_owned().0
+        let processed = self
+            .to_owned()
+            .0
             .iter()
             // group moves by base move ([[U D] [F B F'] ...])
             .batching(|it| {
                 let first = match it.next() {
                     None => return None,
-                    Some(m) => m
+                    Some(m) => m,
                 };
 
                 let base_move = first.base_move();
 
                 let mut ret_vec = vec![first];
-                ret_vec.extend(
-                    it.peeking_take_while(|m| m.base_move() == base_move)
-                );
+                ret_vec.extend(it.peeking_take_while(|m| m.base_move() == base_move));
 
                 Some((base_move, ret_vec))
             })
@@ -207,21 +221,25 @@ impl Alg {
 
                 for m in group {
                     match m.0 {
-                        t if t == base_move =>
-                            base_sum = (base_sum + m.1) % 4,
-                        t if t == opposite_move =>
-                            opposite_sum = (opposite_sum + m.1) % 4,
-                        _ => unreachable!()
+                        t if t == base_move => base_sum = (base_sum + m.1) % 4,
+                        t if t == opposite_move => opposite_sum = (opposite_sum + m.1) % 4,
+                        _ => unreachable!(),
                     }
                 }
 
                 let mut vec = vec![];
 
-                if base_sum != 0 { vec.push(Move(base_move, base_sum)) }
-                if opposite_sum != 0 { vec.push(Move(base_move.opposite(), opposite_sum)) }
+                if base_sum != 0 {
+                    vec.push(Move(base_move, base_sum))
+                }
+                if opposite_sum != 0 {
+                    vec.push(Move(base_move.opposite(), opposite_sum))
+                }
 
                 // e.g. "U F F' U'" => "U U'" requires another pass
-                if base_sum == 0 && opposite_sum == 0 { another_pass = true }
+                if base_sum == 0 && opposite_sum == 0 {
+                    another_pass = true
+                }
 
                 vec
             })
@@ -229,7 +247,11 @@ impl Alg {
 
         // TODO: switch to loop (previous attempt yielded infinite loop weirdness)
         // possible recursive second pass for situations like (R U U' R')
-        if another_pass { processed.simplified() } else { processed }
+        if another_pass {
+            processed.simplified()
+        } else {
+            processed
+        }
     }
 }
 
@@ -264,25 +286,25 @@ impl Transpose for Alg {
         eprintln!("warning: <Alg as Transpose>::transpose_with_projection skipped");
         return;
 
-//        todo!("hi, this is probably very wrong,\
-//            both in style and in function, especially \
-//            the letter array, please refer to the main \
-//            file current cube printing representation");
-//        const M: [MoveType; 6] = {
-//            use MoveType::*;
-//            [D, L, B, U, R, F] // TODO: understand where this is from
-//        };
-//
-//        *self = self.0.iter().map(|mov| {
-//            let index1 = Face::new(M.iter()
-//                .position(|&m| m == mov.0)
-//                .unwrap() as u8);
-//
-//            let index2 = from.iter()
-//                .position(|&f| f == index1)
-//                .unwrap();
-//
-//            Move(M[to[index2].unwrap() as usize], mov.1)
-//        }).collect()
+        //        todo!("hi, this is probably very wrong,\
+        //            both in style and in function, especially \
+        //            the letter array, please refer to the main \
+        //            file current cube printing representation");
+        //        const M: [MoveType; 6] = {
+        //            use MoveType::*;
+        //            [D, L, B, U, R, F] // TODO: understand where this is from
+        //        };
+        //
+        //        *self = self.0.iter().map(|mov| {
+        //            let index1 = Face::new(M.iter()
+        //                .position(|&m| m == mov.0)
+        //                .unwrap() as u8);
+        //
+        //            let index2 = from.iter()
+        //                .position(|&f| f == index1)
+        //                .unwrap();
+        //
+        //            Move(M[to[index2].unwrap() as usize], mov.1)
+        //        }).collect()
     }
 }

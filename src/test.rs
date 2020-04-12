@@ -1,8 +1,16 @@
-#[allow(unused_imports)] use crate::cube::face::Face;
-#[allow(unused_imports)] use crate::cube::piece::{Edge, Corner};
-#[allow(unused_imports)] use crate::cube::transpose::{Transpose, Transposed};
-#[allow(unused_imports)] use crate::cube::algorithm::Alg;
-#[allow(unused_imports)] use crate::cube::{position::{Pos, projection}, piece::Piece};
+#[allow(unused_imports)]
+use crate::cube::algorithm::Alg;
+#[allow(unused_imports)]
+use crate::cube::face::Face;
+#[allow(unused_imports)]
+use crate::cube::piece::{Corner, Edge};
+#[allow(unused_imports)]
+use crate::cube::transpose::{Transpose, Transposed};
+#[allow(unused_imports)]
+use crate::cube::{
+    piece::Piece,
+    position::{projection, Pos},
+};
 
 // apply a testing macro with 2 arguments (e.g. assert_eq) to many pairs of inputs
 macro_rules! apply_ab_tests {
@@ -15,14 +23,14 @@ macro_rules! edge_from_ruby {
     ($arr:expr) => {{
         let [[i0, i1], [p0, p1]] = $arr;
         Piece::new(pos!(i0, i1), pos!(p0, p1))
-    }}
+    }};
 }
 
 macro_rules! corner_from_ruby {
     ($arr:expr) => {{
         let [[i0, i1, i2], [p0, p1, p2]] = $arr;
         Piece::new(pos!(i0, i1, i2), pos!(p0, p1, p2))
-    }}
+    }};
 }
 
 // convert a list of ints to an array of faces
@@ -83,7 +91,7 @@ fn test_transpose_face() {
             let to_pos = pos!(to[0], to[1]);
             let transposed = Face::from(face).transposed(from_pos, to_pos);
             assert_eq!(transposed, Face::from($expected))
-        }}
+        }};
     }
 
     // random sample, too many variations to test exhaustively
@@ -197,13 +205,10 @@ fn test_transpose_edge() {
     macro_rules! assert_eq_transpose_edge {
         (($edge:expr, $from:expr, $to:expr), $expected:expr) => {{
             let mut edge = edge_from_ruby!($edge);
-            edge.transpose(
-                pos!($from[0], $from[1]),
-                pos!($to[0], $to[1]),
-            );
+            edge.transpose(pos!($from[0], $from[1]), pos!($to[0], $to[1]));
             let expected = edge_from_ruby!($expected);
             assert_eq!(edge, expected)
-        }}
+        }};
     }
 
     // random sample, too many variations to test exhaustively
@@ -321,7 +326,7 @@ fn test_transpose_corner() {
             let to_pos = pos!($to[0], $to[1]);
             let transposed = corner.transposed(from_pos, to_pos);
             assert_eq!(transposed, corner_from_ruby!($expected))
-        }}
+        }};
     }
 
     // random sample, too many variations to test exhaustively
@@ -446,7 +451,7 @@ fn test_adjacent() {
         }
     }
 
-    apply_ab_tests!{
+    apply_ab_tests! {
         assert_eq_adjacent;
         (0, [1, 2, 4, 5]);
         (1, [0, 2, 3, 5]);
@@ -473,10 +478,10 @@ fn test_algorithm_reversed() {
     macro_rules! assert_eq_reversed {
         ($alg:expr, $rev:expr) => {
             assert_eq!(Alg::from($alg).reversed(), Alg::from($rev))
-        }
+        };
     }
 
-    apply_ab_tests!{
+    apply_ab_tests! {
         assert_eq_reversed;
         ("R' D L R2 U' B'",          "B U R2 L' D' R");
         ("U2 F D U2 L' R F2",        "F2 R' L U2 D' F' U2");
@@ -497,11 +502,11 @@ fn test_algorithm_simplified() {
     macro_rules! assert_eq_simplified {
         ($alg:expr, $sim:expr) => {
             assert_eq!(Alg::from($alg).simplified(), Alg::from($sim))
-        }
+        };
     }
 
     // note: these tests depend on the base moves (tested with L, D, B (like Rubyks))
-    apply_ab_tests!{
+    apply_ab_tests! {
         assert_eq_simplified;
         ("F U U2 R2 B' F2",                         "F U' R2 B' F2");
         ("R2 F2 D' B B' L'",                        "R2 F2 D' L'");

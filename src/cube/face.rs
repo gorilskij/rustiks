@@ -1,8 +1,8 @@
-use super::transpose::{Transpose, Projection};
-use std::fmt::{Display, Formatter, Error, Debug};
-use std::ops::{Add, Sub};
 use super::piece::Piece;
+use super::transpose::{Projection, Transpose};
 use std::convert::TryInto;
+use std::fmt::{Debug, Display, Error, Formatter};
+use std::ops::{Add, Sub};
 
 // TODO: consider converting to an enum
 // TODO: or writing a strong tie between front, back, ... and 0, 1, ...
@@ -18,10 +18,10 @@ impl From<u8> for Face {
 // todo understand who uses this and how and refactor
 impl From<char> for Face {
     fn from(c: char) -> Self {
-//        panic!("")
-//        todo!("wtf")
-        Self::new(c.to_digit(10)
-            .unwrap_or_else(|| panic!("{} is not a valid integer", c)) as u8)
+        Self::new(
+            c.to_digit(10)
+                .unwrap_or_else(|| panic!("{} is not a valid integer", c)) as u8,
+        )
     }
 }
 
@@ -46,7 +46,9 @@ impl Sub<u8> for Face {
 
     fn sub(self, other: u8) -> Self::Output {
         let mut self_0 = self.0;
-        while other > self_0 { self_0 += 6; }
+        while other > self_0 {
+            self_0 += 6;
+        }
         Self((self_0 - other) % 6)
     }
 }
@@ -63,7 +65,7 @@ impl Face {
     pub const fn new(value: u8) -> Self {
         // commented due to assert not working with const fn
         // TODO: find a way to still check
-//        assert!(value <= 5);
+        //        assert!(value <= 5);
         Self(value)
     }
 
@@ -87,13 +89,17 @@ impl Face {
 
     pub fn adjacent_clockwise(self) -> [Self; 4] {
         let mut adjacent = self.adjacent();
-        if self.is_even() { adjacent.reverse() }
+        if self.is_even() {
+            adjacent.reverse()
+        }
         adjacent
     }
 
     pub fn adjacent_edges(self) -> [Piece<2>; 4] {
         let adjacent = self.adjacent();
-        adjacent.iter().map(|&f| Piece::new_edge(f, self))
+        adjacent
+            .iter()
+            .map(|&f| Piece::new_edge(f, self))
             .collect::<Vec<_>>()
             .as_slice()
             .try_into()
@@ -102,8 +108,8 @@ impl Face {
 
     pub fn adjacent_corners(self) -> [Piece<3>; 4] {
         let adjacent = self.adjacent();
-        (0..4).map(|i|
-            Piece::new_corner(self, adjacent[i], adjacent[(i + 1) % 4]))
+        (0..4)
+            .map(|i| Piece::new_corner(self, adjacent[i], adjacent[(i + 1) % 4]))
             .collect::<Vec<_>>()
             .as_slice()
             .try_into()
@@ -113,10 +119,7 @@ impl Face {
 
 impl Transpose for Face {
     fn transpose_with_projection(&mut self, from: Projection, to: Projection) {
-        let index = from
-            .iter()
-            .position(|x| x == self)
-            .unwrap();
+        let index = from.iter().position(|x| x == self).unwrap();
 
         *self = to[index]
     }
@@ -124,15 +127,19 @@ impl Transpose for Face {
 
 impl Display for Face {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "{}", match self.0 {
-            0 => "W",
-            1 => "R",
-            2 => "B",
-            3 => "Y",
-            4 => "O",
-            5 => "G",
-            _ => unreachable!(),
-        })
+        write!(
+            f,
+            "{}",
+            match self.0 {
+                0 => "W",
+                1 => "R",
+                2 => "B",
+                3 => "Y",
+                4 => "O",
+                5 => "G",
+                _ => unreachable!(),
+            }
+        )
     }
 }
 

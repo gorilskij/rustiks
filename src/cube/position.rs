@@ -8,20 +8,27 @@ macro_rules! pos {
 }
 
 use super::Face;
-use std::ops::{Deref, Index, IndexMut};
 use crate::cube::transpose::{Projection, Transpose};
-use std::iter::{once, FromIterator};
-use std::fmt::{Debug, Formatter, Error};
-use std::hash::{Hash, Hasher};
 use itertools::Itertools;
+use std::fmt::{Debug, Error, Formatter};
+use std::hash::{Hash, Hasher};
+use std::iter::{once, FromIterator};
+use std::ops::{Deref, Index, IndexMut};
 
 #[derive(Copy, Clone)]
 pub struct Pos<const N: usize>(pub [Face; N]);
 
 // todo derive when possible
-impl Hash for Pos<2> { fn hash<H: Hasher>(&self, state: &mut H) { self.0.hash(state) } }
-impl Hash for Pos<3> { fn hash<H: Hasher>(&self, state: &mut H) { self.0.hash(state) } }
-
+impl Hash for Pos<2> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.0.hash(state)
+    }
+}
+impl Hash for Pos<3> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.0.hash(state)
+    }
+}
 
 // TODO derive these traits when const generics are fully implemented
 impl<const N: usize> PartialEq for Pos<N> {
@@ -38,9 +45,10 @@ impl<const N: usize> Eq for Pos<N> {}
 
 impl<const N: usize> Debug for Pos<N> {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "{{{}}}", self.0.iter()
-            .map(|f| format!("{:?}", f))
-            .join(" ")
+        write!(
+            f,
+            "{{{}}}",
+            self.0.iter().map(|f| format!("{:?}", f)).join(" ")
         )
     }
 }
@@ -57,7 +65,7 @@ impl<const N: usize> Deref for Pos<N> {
 
 impl<const N: usize> Pos<N> {
     // TODO: remove in favor of deref
-    pub fn iter(&self) -> impl Iterator<Item=&Face> {
+    pub fn iter(&self) -> impl Iterator<Item = &Face> {
         self.0.iter()
     }
 
@@ -77,26 +85,20 @@ pub fn projection(position: Pos<2>) -> Projection {
     let mut mid = front.adjacent_clockwise();
 
     let len = mid.len();
-    let index = mid
-        .iter()
-        .position(|x| *x == down)
-        .unwrap();
+    let index = mid.iter().position(|x| *x == down).unwrap();
 
     mid.rotate_left((index + 3) % len);
 
     // this is ugly, TODO: improve
     let opposite = front.opposite();
-    let iterator = once(&front)
-        .chain(&mid)
-        .chain(once(&opposite))
-        .copied();
+    let iterator = once(&front).chain(&mid).chain(once(&opposite)).copied();
 
     array_collect!(iterator, [Face; 6])
 }
 
 impl<const N: usize> Transpose for Pos<N> {
     fn transpose_with_projection(&mut self, from: Projection, to: Projection) {
-        for x in &mut self.0 as &mut[Face] {
+        for x in &mut self.0 as &mut [Face] {
             x.transpose_with_projection(from, to)
         }
     }
@@ -105,8 +107,9 @@ impl<const N: usize> Transpose for Pos<N> {
 impl<const N: usize> Pos<N> {
     // fucked up because N - 1 and N - 1 are different types, TODO: clean up
     pub fn without(&self, face: Face) -> Vec<Face> {
-//        unsafe { std::mem::transmute( Position(array_collect!(self.iter().filter(|&&x| x != face).copied(), [Face; {N - 1}])) ) }
-        let vec = self.iter()
+        //        unsafe { std::mem::transmute( Position(array_collect!(self.iter().filter(|&&x| x != face).copied(), [Face; {N - 1}])) ) }
+        let vec = self
+            .iter()
             .copied()
             .filter(|&f| f != face)
             .collect::<Vec<_>>();
@@ -118,16 +121,20 @@ impl<const N: usize> Pos<N> {
 impl<const N: usize> Index<usize> for Pos<N> {
     type Output = Face;
 
-    fn index(&self, index: usize) -> &Self::Output { &self.0[index] }
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.0[index]
+    }
 }
 
 impl<const N: usize> IndexMut<usize> for Pos<N> {
-    fn index_mut(&mut self, index: usize) -> &mut Self::Output { &mut self.0[index] }
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.0[index]
+    }
 }
 
 // todo make generic when possible
 impl<A: Into<Face>> FromIterator<A> for Pos<2> {
-    fn from_iter<T: IntoIterator<Item=A>>(iter: T) -> Self {
+    fn from_iter<T: IntoIterator<Item = A>>(iter: T) -> Self {
         let mut faces = [Face::new(0); 2];
         let mut i = 0;
         for t in iter {
@@ -139,7 +146,7 @@ impl<A: Into<Face>> FromIterator<A> for Pos<2> {
     }
 }
 impl<A: Into<Face>> FromIterator<A> for Pos<3> {
-    fn from_iter<T: IntoIterator<Item=A>>(iter: T) -> Self {
+    fn from_iter<T: IntoIterator<Item = A>>(iter: T) -> Self {
         let mut faces = [Face::new(0); 3];
         let mut i = 0;
         for t in iter {

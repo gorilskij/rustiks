@@ -1,11 +1,10 @@
-use std::fmt::{Debug, Display, Formatter, Error};
-use crate::cube::transpose::{Transpose, Projection};
-use crate::cube::resort::Resort;
-use itertools::Itertools;
-use crate::cube::position::Pos;
 use crate::cube::face::Face;
+use crate::cube::position::Pos;
+use crate::cube::resort::Resort;
+use crate::cube::transpose::{Projection, Transpose};
+use itertools::Itertools;
 use std::convert::TryInto;
-
+use std::fmt::{Debug, Display, Error, Formatter};
 
 pub type Edge = Piece<2>;
 pub type Corner = Piece<3>;
@@ -16,19 +15,16 @@ pub struct Piece<const N: usize> {
     pos: Pos<N>,
 }
 
-
 // todo generalize and refactor into from_ruby in test file
 
 // todo derive
 impl<const N: usize> Debug for Piece<N> {
     fn fmt(&self, f: &mut Formatter) -> Result<(), Error> {
-        write!(f, "({})[{}]",
-            self.id.iter()
-                .map(|f| format!("{:?}", f))
-                .join(" "),
-            self.pos.iter()
-               .map(|f| format!("{:?}", f))
-               .join(" "),
+        write!(
+            f,
+            "({})[{}]",
+            self.id.iter().map(|f| format!("{:?}", f)).join(" "),
+            self.pos.iter().map(|f| format!("{:?}", f)).join(" "),
         )
     }
 }
@@ -37,7 +33,10 @@ impl<const N: usize> Debug for Piece<N> {
 impl<const N: usize> Resort for Piece<N> {
     // todo improve implementation when const generics allow
     fn resort(&mut self) {
-        let mut pairs = self.id.iter().copied()
+        let mut pairs = self
+            .id
+            .iter()
+            .copied()
             .zip(self.pos.iter().copied())
             .collect::<Vec<_>>();
 
@@ -59,9 +58,9 @@ impl<const N: usize> Transpose for Piece<N> {
 }
 
 impl<const N: usize> Piece<N> {
-//    pub fn transpose_pos(&mut self, from: Position<2>, Position<2>) {
-//        self.pos.transpose()
-//    }
+    //    pub fn transpose_pos(&mut self, from: Position<2>, Position<2>) {
+    //        self.pos.transpose()
+    //    }
 
     pub fn new(id: Pos<N>, pos: Pos<N>) -> Self {
         let mut piece = Self { id, pos };
@@ -69,9 +68,13 @@ impl<const N: usize> Piece<N> {
         piece
     }
 
-    pub fn id(&self) -> &Pos<N> { &self.id }
+    pub fn id(&self) -> &Pos<N> {
+        &self.id
+    }
 
-    pub fn pos(&self) -> &Pos<N> { &self.pos }
+    pub fn pos(&self) -> &Pos<N> {
+        &self.pos
+    }
 
     pub fn transpose_pos(&mut self, from: Pos<2>, to: Pos<2>) {
         self.pos.transpose(from, to)
@@ -82,7 +85,9 @@ impl<const N: usize> Piece<N> {
     }
 
     pub fn id_on(&self, face: Face) -> Face {
-        let idx = self.pos.iter()
+        let idx = self
+            .pos
+            .iter()
             .position(|&f| f == face)
             .expect("not on that face");
 

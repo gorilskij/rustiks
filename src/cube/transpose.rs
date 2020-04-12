@@ -1,12 +1,12 @@
 use crate::cube::face::Face;
-use crate::cube::position::{Pos, projection};
+use crate::cube::position::{projection, Pos};
 
 pub type Projection = [Face; 6];
 
 pub trait Transpose {
     fn transpose_with_projection(&mut self, from: Projection, to: Projection);
 
-    fn transpose(&mut self, from: Pos<2>, to: Pos<2>){
+    fn transpose(&mut self, from: Pos<2>, to: Pos<2>) {
         self.transpose_with_projection(projection(from), projection(to))
     }
 }

@@ -1,7 +1,7 @@
 use crate::cube::Cube;
-use std::fmt::{Debug, Formatter, Error, Display};
-use colored::{Colorize, ColoredString};
+use colored::{ColoredString, Colorize};
 use itertools::Itertools;
+use std::fmt::{Debug, Display, Error, Formatter};
 
 fn to_color(f: u8) -> ColoredString {
     let s = "  ";
@@ -12,17 +12,17 @@ fn to_color(f: u8) -> ColoredString {
         4 => s.on_magenta(),
         5 => s.on_green(),
         3 => s.on_yellow(),
-        _ => unreachable!()
+        _ => unreachable!(),
     }
 }
-
 
 // TODO: maybe find a better way to do this
 #[derive(Copy, Clone)]
 pub struct ColoredCube<'a>(&'a Cube);
 
 fn color_cube<S: AsRef<str>>(uncolored: S) -> String {
-    uncolored.as_ref()
+    uncolored
+        .as_ref()
         .replace("\n\n", "nn")
         .replace("\n", "\n\n")
         .replace("nn", "\n\n\n")
@@ -31,9 +31,10 @@ fn color_cube<S: AsRef<str>>(uncolored: S) -> String {
         .chars()
         .map(|c| {
             if c.is_numeric() {
-                to_color(c.to_string()
-                    .parse()
-                    .expect(&format!("couldn't parse '{}' as u8", c))
+                to_color(
+                    c.to_string()
+                        .parse()
+                        .expect(&format!("couldn't parse '{}' as u8", c)),
                 )
             } else {
                 c.to_string().normal()

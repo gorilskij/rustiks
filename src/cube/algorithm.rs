@@ -260,8 +260,7 @@ impl Debug for Alg {
 
 // WARN: unfinished and probably wrong
 impl Transpose for Alg {
-    fn transpose_with_projection(&mut self, from: Projection, to: Projection) {
-
+    fn transpose_with_projection(&mut self, _from: Projection, _to: Projection) {
         eprintln!("warning: <Alg as Transpose>::transpose_with_projection skipped");
         return;
 
@@ -269,21 +268,21 @@ impl Transpose for Alg {
 //            both in style and in function, especially \
 //            the letter array, please refer to the main \
 //            file current cube printing representation");
-        const M: [MoveType; 6] = {
-            use MoveType::*;
-            [D, L, B, U, R, F] // TODO: understand where this is from
-        };
-
-        *self = self.0.iter().map(|mov| {
-            let index1 = Face::new(M.iter()
-                .position(|&m| m == mov.0)
-                .unwrap() as u8);
-
-            let index2 = from.iter()
-                .position(|&f| f == index1)
-                .unwrap();
-
-            Move(M[to[index2].unwrap() as usize], mov.1)
-        }).collect()
+//        const M: [MoveType; 6] = {
+//            use MoveType::*;
+//            [D, L, B, U, R, F] // TODO: understand where this is from
+//        };
+//
+//        *self = self.0.iter().map(|mov| {
+//            let index1 = Face::new(M.iter()
+//                .position(|&m| m == mov.0)
+//                .unwrap() as u8);
+//
+//            let index2 = from.iter()
+//                .position(|&f| f == index1)
+//                .unwrap();
+//
+//            Move(M[to[index2].unwrap() as usize], mov.1)
+//        }).collect()
     }
 }

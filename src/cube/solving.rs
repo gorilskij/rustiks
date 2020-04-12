@@ -21,7 +21,7 @@ impl Cube {
         // todo try in all permutations of order
 
 
-        let mut test_cube = *self;
+        let test_cube = *self;
         let mut final_algorithm = Alg::new();
 
         for &other in &face.adjacent() {
